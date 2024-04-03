@@ -18,6 +18,12 @@ pack: student/*
 check: pack vendor
 	./is_it_ok.sh $(LOGIN).zip $(TEMP_DIR) $(TASK) 
 
+run:
+	php8.3 $(SCRIPT) --source=codeexamples/read_test.src --input=codeexamples/read_test.in
+
+stan:
+	php8.3 vendor/bin/phpstan
+
 run-help: interpret.php
 	if [ "${HOSTNAME}" = "merlin.fit.vutbr.cz" ]; then php8.3 $(SCRIPT) --help; else php $(SCRIPT) --help; fi
 
