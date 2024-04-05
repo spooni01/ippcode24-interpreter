@@ -2,79 +2,122 @@
 
 namespace IPP\Student;
 
+// External
 use DOMDocument;
-use DOMXPath;
+
+// Devcontainer
 use IPP\Core\AbstractInterpreter;
-use IPP\Core\Exception\XMLException;
-use IPP\Student\Instruction;
-use IPP\Student\Frame;
+use IPP\Core\ReturnCode;
+use IPP\Core\Exception\XMLException; // return code 31
+use IPP\Core\Exception\IntegrationException; // return code 88
 
-/* Definition of enums */
-enum Frames : string {
-    case Global = "GF";
-    case Temporaly = "TF";
-    case Local = "LF";
-}
-enum VariablesTypes : string {
-    case Int = "Int";
-    case String = "String";
-}
+// Internal
+use IPP\Student\Exception\InvalidSourceStructureException; // return code 32
 
-/* Main class */
+
+/*
+ *  Main interpreter class
+ */
 class Interpreter extends AbstractInterpreter
 {
 
-    private array $instrOrder = [];
-    private Frame $frame;
+    private mixed $instructionNumbers = []; // Stores order numbers
+    private int $positionOfInstructions = 0; // Stores position of current instruction in $instructionNumbers
+
 
     /*
      * Main function
      */
     public function execute(): int
     {
+   
+        try
+        {
 
-        $this->frame = new Frame;
-        $dom = $this->source->getDOMDocument(); // Get XML        
-        $val = $this->input->readString();  // Read input
+            $dom = $this->source->getDOMDocument(); // Get XML   
+            $this->processOrderNumbers($dom); // Process order numbers
 
-        // Check header
-        $rootNode = $dom->documentElement;
-        if($rootNode == false || $rootNode->nodeName != "program" || $rootNode->getAttribute("language") != "IPPcode24") {
-            $this->stderr->writeString("Error: wrong header of XML code.");
-            exit(31);    
-        }
+            // Loop through instructions by order number
+            while ($this->positionOfInstructions < count($this->instructionNumbers)) {
 
-        // Get order numbers and sort it
-        foreach($rootNode->childNodes as $instr) {
-            if ($instr->nodeType === XML_ELEMENT_NODE) {
-                array_push($this->instrOrder, $instr->getAttributeNode("order")->nodeValue);
-            }
-        }
-        sort($this->instrOrder);
+                // TODO2: find instruction by its number and parse it also with arguments
+                // TODO3: Create Queue, Stack, Frame
+                // TODO4: Implement operands
 
-        // Loop through instructions by order number
-        foreach($this->instrOrder as $instrNum) { 
-            $xpath = new DOMXPath($dom);
-            $expression = "//instruction[@order='$instrNum']";
-            $xmlInstr = $xpath->query($expression)->item(0);
-
-            try
-            {
-
-                $instruction = new Instruction($xmlInstr, $this->frame);
+                $this->positionOfInstructions += 1;
 
             }
-            catch (XMLException $errMsg)
-            {
-                $this->stderr->writeString($errMsg);
-                exit(31);  
-            }
+
+        }
+        catch (XMLException $errMsg) 
+        {
+
+            $this->stderr->writeString($errMsg);
+            exit(ReturnCode::INVALID_XML_ERROR); 
+
+        }
+        catch (InvalidSourceStructureException $errMsg) 
+        {
+
+            $this->stderr->writeString($errMsg);
+            exit(ReturnCode::INVALID_SOURCE_STRUCTURE); 
+
+        }
+        catch (IntegrationException $errMsg) 
+        {
+
+            $this->stderr->writeString($errMsg);
+            exit(ReturnCode::INTEGRATION_ERROR); 
+
         }
 
-        $this->frame->print();
-    
         return 0;
 
     }
+
+
+    /*
+     *  Get order numbers and sort it
+     */
+    private function processOrderNumbers(DOMDocument $dom) : void
+    {
+
+        // Retrieve order numbers
+        $rootNode = $dom->documentElement;
+        foreach($rootNode->childNodes as $instr) {
+            if ($instr->nodeType === XML_ELEMENT_NODE) {
+                
+                // Check if numbers are bigger or equal 0
+                $orderNum = $instr->getAttribute("order"); /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
+
+                if (!ctype_digit($orderNum)) 
+                    throw new InvalidSourceStructureException("Parameter `order` must be integer bigger or equal than zero.");     
+                else
+                    array_push($this->instructionNumbers, $orderNum); 
+            
+            }
+        }
+
+        // Sort array to go from lowest to highest
+        sort($this->instructionNumbers);
+
+        // Check if numbers are bigger or equal 0
+        if ($this->instructionNumbers[0] <= 0) 
+            throw new InvalidSourceStructureException("Numbers must be bigger or equal zero.");     
+
+        // Check if there is duplicated order number
+        $orderCounts = array_count_values($this->instructionNumbers);
+        foreach ($rootNode->childNodes as $child) {
+            
+            if ($child->nodeType === XML_ELEMENT_NODE && $child->tagName === 'instruction') { /** @phpstan-ignore-line */ // phpstan was throwing error that $tagName is undefined, but it exists
+                $order = (int) $child->getAttribute('order'); /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
+                if (isset($orderCounts[$order]) && $orderCounts[$order] > 1) 
+                    throw new InvalidSourceStructureException("There is duplicated order number: $order.");           
+            }
+            
+        }
+
+    }
+
 
 }

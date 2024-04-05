@@ -22,7 +22,10 @@ run:
 	php8.3 $(SCRIPT) --source=codeexamples/read_test.src --input=codeexamples/read_test.in
 
 stan:
-	php8.3 vendor/bin/phpstan
+	php8.3 vendor/bin/phpstan analyze --level=6
+
+test:
+	python3.8 TESTS/supplementary-tests/test-int.py
 
 run-help: interpret.php
 	if [ "${HOSTNAME}" = "merlin.fit.vutbr.cz" ]; then php8.3 $(SCRIPT) --help; else php $(SCRIPT) --help; fi
