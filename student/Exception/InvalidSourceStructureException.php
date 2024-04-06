@@ -15,7 +15,7 @@ use Throwable;
  */
 class InvalidSourceStructureException extends Exception
 {
-    public function __construct(string $message = "Invalid source structure.", ?Throwable $previous = null, private bool $showTrace = true)
+    public function __construct(string $message = "Invalid source structure.", ?Throwable $previous = null)
     {
         parent::__construct($message, ReturnCode::INVALID_SOURCE_STRUCTURE, $previous);
     }

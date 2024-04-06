@@ -4,6 +4,7 @@ namespace IPP\Student;
 
 // External
 use DOMDocument;
+use DOMElement;
 
 // Devcontainer
 use IPP\Core\AbstractInterpreter;
@@ -13,6 +14,7 @@ use IPP\Core\Exception\IntegrationException; // return code 88
 
 // Internal
 use IPP\Student\Exception\InvalidSourceStructureException; // return code 32
+use IPP\Student\Instruction;
 
 
 /*
@@ -22,7 +24,7 @@ class Interpreter extends AbstractInterpreter
 {
 
     private mixed $instructionNumbers = []; // Stores order numbers
-    private int $positionOfInstructions = 0; // Stores position of current instruction in $instructionNumbers
+    private int $positionOfInstruction = -1; // Stores position of current instruction in $instructionNumbers
 
 
     /*
@@ -31,44 +33,35 @@ class Interpreter extends AbstractInterpreter
     public function execute(): int
     {
    
-        try
-        {
+        try {
 
             $dom = $this->source->getDOMDocument(); // Get XML   
             $this->processOrderNumbers($dom); // Process order numbers
 
             // Loop through instructions by order number
-            while ($this->positionOfInstructions < count($this->instructionNumbers)) {
+            while ($this->positionOfInstruction < (count($this->instructionNumbers) - 1) ) {
 
-                // TODO2: find instruction by its number and parse it also with arguments
-                // TODO3: Create Queue, Stack, Frame
-                // TODO4: Implement operands
+                $this->positionOfInstruction += 1; // Increment to get next instruction, (starts from 0, predefined value is -1)
+                $xmlInstr = $this->foundInstructionByOrderNumber($dom->documentElement); // Get instruction by its order number ($this->positionOfInstruction)
 
-                $this->positionOfInstructions += 1;
+                // Parse and execute instruction with order number $this->instructionNumbers
+                $instr = new Instruction($xmlInstr, $this->instructionNumbers[$this->positionOfInstruction]);
+
+                // TODO1: parse argument,show to check next instrution number
+                // TODO2: Create Queue, Stack, Frame
+                // TODO3: Implement operands
 
             }
 
-        }
-        catch (XMLException $errMsg) 
-        {
-
+        } catch (XMLException $errMsg) {
             $this->stderr->writeString($errMsg);
             exit(ReturnCode::INVALID_XML_ERROR); 
-
-        }
-        catch (InvalidSourceStructureException $errMsg) 
-        {
-
+        } catch (InvalidSourceStructureException $errMsg) {
             $this->stderr->writeString($errMsg);
             exit(ReturnCode::INVALID_SOURCE_STRUCTURE); 
-
-        }
-        catch (IntegrationException $errMsg) 
-        {
-
+        } catch (IntegrationException $errMsg) {
             $this->stderr->writeString($errMsg);
             exit(ReturnCode::INTEGRATION_ERROR); 
-
         }
 
         return 0;
@@ -117,6 +110,32 @@ class Interpreter extends AbstractInterpreter
             
         }
 
+    }
+
+
+    /**
+     *  Get instruction by its order number ($this->positionOfInstruction)
+     *  @param DOMElement $rootNode
+     */
+    private function foundInstructionByOrderNumber($rootNode) : DOMElement
+    {
+        
+        foreach ($rootNode->childNodes as $instr) {
+
+            if ($instr->nodeType == XML_ELEMENT_NODE && $instr->tagName == 'instruction') { /** @phpstan-ignore-line */ // phpstan was throwing error that $tagName do not exists, but it exists
+                
+                if ((int)$instr->getAttribute('order') == $this->instructionNumbers[$this->positionOfInstruction]) /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
+                    return $instr; /** @phpstan-ignore-line */ // phpstan was throwing error that this returns DOMNode, but it returns DOMElement
+
+            }
+
+        }
+
+        // Just for phpstan, do not need to check if node with order number exists because in
+        // $this->instructionNumbers are only numbers with defined order. 
+        $tmp = new DOMElement("x");
+        return $tmp;
+    
     }
 
 
