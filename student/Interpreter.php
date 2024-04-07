@@ -52,8 +52,9 @@ class Interpreter extends AbstractInterpreter
                     $this->positionOfInstruction = $instr->getNextSpecialInstruction();
                     $this->positionOfInstruction--; // Instruction function will return correct number, so it must be deacresed by 1 because at the beginning of another while cycle it will by instantly increased by 1
                 }
-                // TODO1: Create Queue, Stack, Frame
+                // TODO1: Create Frame
                 // TODO2: Implement operands
+                // TODO2: errcodes
                 // TODO3: check assignment, make documentation (f.e. check if <program> has correct attributes and values)
 
             }
