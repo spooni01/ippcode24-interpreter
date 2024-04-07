@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <program language="IPPcode24">
-    <instruction order="1" opcode="DEFVAR">
+    <instruction order="1" opcode="DEfVAR">
         <arg1 type="var">GF@a</arg1>
     </instruction>
     <instruction order="2" opcode="READ">

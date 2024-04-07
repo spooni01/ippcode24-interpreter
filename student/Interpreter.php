@@ -47,9 +47,14 @@ class Interpreter extends AbstractInterpreter
                 // Parse and execute instruction with order number $this->instructionNumbers
                 $instr = new Instruction($xmlInstr, $this->instructionNumbers[$this->positionOfInstruction]);
 
-                // TODO1: parse argument,show to check next instrution number
-                // TODO2: Create Queue, Stack, Frame
-                // TODO3: Implement operands
+                // If next instruction is special, set it to its position number
+                if($instr->isNextPositionSpecial()) {
+                    $this->positionOfInstruction = $instr->getNextSpecialInstruction();
+                    $this->positionOfInstruction--; // Instruction function will return correct number, so it must be deacresed by 1 because at the beginning of another while cycle it will by instantly increased by 1
+                }
+                // TODO1: Create Queue, Stack, Frame
+                // TODO2: Implement operands
+                // TODO3: check assignment, make documentation (f.e. check if <program> has correct attributes and values)
 
             }
 

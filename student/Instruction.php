@@ -8,6 +8,7 @@ use DOMElement;
 
 // Internal
 use IPP\Student\Exception\InvalidSourceStructureException; // return code 32
+use IPP\Student\Argument;
 
 
 class Instruction 
@@ -15,6 +16,11 @@ class Instruction
 
     private int $order;
     private string $opcode;
+    private Argument $arg1;
+    private Argument $arg2;
+    private Argument $arg3;
+    private bool $specialNextInstr = false;
+    private int $specialNextInstrNum;
     private mixed $operands = [
         ["opCode" => "MOVE", "params" => ["var", "symb"]],
         ["opCode" => "CREATEFRAME", "params" => []],
@@ -61,31 +67,30 @@ class Instruction
     {
         
         $this->order = $order;
-        $this->opcode = strtoupper($node->getAttribute('opcode'));
+        $this->opcode = strtoupper($node->getAttribute("opcode"));
 
         // Get correct params, that have to be in XML (this function also checks if opcode exist)
         $opcodeParams = $this->getCorrectParams();
 
-        /***/ 
-        //todo arguments
         // Extract arguments with type and value
-        $arguments = [];
+        $cnt = 0;
         foreach ($node->childNodes as $childNode) {
-            if ($childNode->nodeType === XML_ELEMENT_NODE) {
-                $type = $childNode->getAttribute('type'); /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
-                $value = $childNode->textContent;
-                $arguments[] = ['type' => $type, 'value' => $value];
+            if ($childNode->nodeType == XML_ELEMENT_NODE) {
+
+                $cnt++;
+
+                // Save to correct variable
+                if($cnt == 1) 
+                    $this->arg1 = new Argument($childNode->textContent, $childNode->getAttribute("type")); /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
+                else if($cnt == 2)
+                    $this->arg2 = new Argument($childNode->textContent, $childNode->getAttribute("type")); /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
+                else if($cnt == 3)
+                    $this->arg3 = new Argument($childNode->textContent, $childNode->getAttribute("type")); /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
+                else
+                    throw new InvalidSourceStructureException("Maximum number of arguments is 3.");           
+            
             }
         }
-
-        // Print extracted data
-        print("Order: " . $this->order . "\n");
-        print("Opcode: " . $this->opcode . "\n");
-        print( "Arguments:\n");
-        foreach ($arguments as $argument) {
-            print( "- Type: " . $argument['type'] . ", Value: " . $argument['value'] . "\n");
-        }
-
 
     }
 
@@ -98,8 +103,8 @@ class Instruction
     {
       
         foreach ($this->operands as $operand) {
-            if ($operand['opCode'] == $this->opcode) {
-                return $operand['params'];
+            if ($operand["opCode"] == $this->opcode) {
+                return $operand["params"];
             }
         }
     
@@ -108,5 +113,55 @@ class Instruction
     
     }
 
+    
+    /**
+     * Get argument by its number
+     */
+    public function getArgument(int $position = 1) : Argument {
+
+        if($position == 1) {
+            return $this->arg1;
+        }
+        else if($position == 2) {
+            return $this->arg2;
+        }
+        else {
+            return $this->arg3;
+        }
+
+    }
+
+
+    /**
+     * Get order
+     */
+    public function getOrder() : int {
+
+        return $this->order;
+
+    }
+
+
+    /**
+     * Return true if the next instruction will be on another position
+     */
+    public function isNextPositionSpecial() : bool {
+
+        if($this->specialNextInstr) 
+            return true;
+
+        return false;
+
+    }
+    
+
+    /**
+     * Return true if the next instruction will be on another position
+     */
+    public function getNextSpecialInstruction() : int {
+
+        return $this->specialNextInstrNum;
+
+    }
 
 }
