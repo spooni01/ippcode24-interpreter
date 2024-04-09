@@ -1,0 +1,482 @@
+[1;31mBad stdout[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/TYPE/type_bool.src
+0a1
+> bool
+\ No newline at end of file
+
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/TYPE/type_bool.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/TYPE/type_bool.in
+[1;31mBad stdout[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/TYPE/type_var.src
+0a1
+> string
+\ No newline at end of file
+
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/TYPE/type_var.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/TYPE/type_var.in
+[1;31mBad stdout[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/TYPE/type_int.src
+0a1
+> int
+\ No newline at end of file
+
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/TYPE/type_int.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/TYPE/type_int.in
+[1;31mBad stdout[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/TYPE/type_string.src
+0a1
+> string
+\ No newline at end of file
+
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/TYPE/type_string.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/TYPE/type_string.in
+[1;31mBad stdout[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/TYPE/type_nil.src
+0a1
+> nil
+\ No newline at end of file
+
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/TYPE/type_nil.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/TYPE/type_nil.in
+
+[1;31mBad stdout[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_var.src
+0a1
+> 97
+\ No newline at end of file
+
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_var.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_var.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_var.src
+got rc | expected rc
+53    |	0
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_var.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_var.in
+
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_wrong_int_nil.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_wrong_int_nil.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_wrong_int_nil.in
+[1;31mBad stdout[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_int.src
+0a1
+> 99
+\ No newline at end of file
+
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_int.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_int.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_int.src
+got rc | expected rc
+53    |	0
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_int.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_int.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_wrong_int_bool.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_wrong_int_bool.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_wrong_int_bool.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_wrong_index.src
+got rc | expected rc
+53    |	58
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_wrong_index.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_wrong_index.in
+
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_wrong_int_int.src
+got rc | expected rc
+58    |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_wrong_int_int.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_wrong_int_int.in
+
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_wrong_int_string.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_wrong_int_string.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STR2INT/stri2int_wrong_int_string.in
+
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_bool_nil.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_bool_nil.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_bool_nil.in
+[1;32mPASS[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_symb.src
+[1;32mPASS[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_bool_string.src
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_nil_int.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_nil_int.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_nil_int.in
+
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_nil_string.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_nil_string.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_nil_string.in
+
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_nil_bool.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_nil_bool.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_nil_bool.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_nil_nil.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_nil_nil.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_nil_nil.in
+
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_string_nil.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_string_nil.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_string_nil.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_int_nil.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_int_nil.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GT/gt_wrong_int_nil.in
+
+[1;31mBad stdout[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/JUMPIFNEQ/jumpifneq.src
+1d0
+< 42
+\ No newline at end of file
+
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/JUMPIFNEQ/jumpifneq.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/JUMPIFNEQ/jumpifneq.in
+
+[1;31mBad stdout[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/JUMPIFNEQ/jumpifneq2.src
+1c1
+< 6942
+\ No newline at end of file
+---
+> 69
+\ No newline at end of file
+
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/JUMPIFNEQ/jumpifneq2.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/JUMPIFNEQ/jumpifneq2.in
+
+[1;31mBad stdout[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STACK/pushs_nil.src
+1d0
+< nil
+\ No newline at end of file
+
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STACK/pushs_nil.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/STACK/pushs_nil.in
+
+[1;31mBad stdout[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/ultra_test.src
+4a5,124
+> 	OK!
+> Test [2]
+> 	Očekávaná hodnota: 5
+> 	Reálná hodnota: 5
+> 	OK!
+> Test [3]
+> 	Očekávaná hodnota: 50
+> 	Reálná hodnota: 50
+> 	OK!
+> Test [4]
+> 	Očekávaná hodnota: 2
+> 	Reálná hodnota: 2
+> 	OK!
+> Logika - int
+> Test [5]
+> 	Očekávaná hodnota: false
+> 	Reálná hodnota: false
+> 	OK!
+> Test [6]
+> 	Očekávaná hodnota: true
+> 	Reálná hodnota: true
+> 	OK!
+> Test [7]
+> 	Očekávaná hodnota: false
+> 	Reálná hodnota: false
+> 	OK!
+> Test [8]
+> 	Očekávaná hodnota: true
+> 	Reálná hodnota: true
+> 	OK!
+> Logika - string
+> Test [9]
+> 	Očekávaná hodnota: false
+> 	Reálná hodnota: false
+> 	OK!
+> Test [10]
+> 	Očekávaná hodnota: true
+> 	Reálná hodnota: true
+> 	OK!
+> Test [11]
+> 	Očekávaná hodnota: false
+> 	Reálná hodnota: false
+> 	OK!
+> Test [12]
+> 	Očekávaná hodnota: true
+> 	Reálná hodnota: true
+> 	OK!
+> Logika - bool
+> Test [13]
+> 	Očekávaná hodnota: false
+> 	Reálná hodnota: false
+> 	OK!
+> Test [14]
+> 	Očekávaná hodnota: true
+> 	Reálná hodnota: true
+> 	OK!
+> Test [15]
+> 	Očekávaná hodnota: false
+> 	Reálná hodnota: false
+> 	OK!
+> Test [16]
+> 	Očekávaná hodnota: true
+> 	Reálná hodnota: true
+> 	OK!
+> Test [17]
+> 	Očekávaná hodnota: false
+> 	Reálná hodnota: false
+> 	OK!
+> Test [18]
+> 	Očekávaná hodnota: true
+> 	Reálná hodnota: true
+> 	OK!
+> Test [19]
+> 	Očekávaná hodnota: true
+> 	Reálná hodnota: true
+> 	OK!
+> Loops
+> Zadej počet iterací: 69
+> Test [20]
+> 	Očekávaná hodnota: 69
+> 	Reálná hodnota: 69
+> 	OK!
+> String, typy
+> Test [21]
+> 	Očekávaná hodnota: 4
+> 	Reálná hodnota: 4
+> 	OK!
+> Test [22]
+> 	Očekávaná hodnota: d
+> 	Reálná hodnota: d
+> 	OK!
+> Test [23]
+> 	Očekávaná hodnota: aaoa
+> 	Reálná hodnota: aaoa
+> 	OK!
+> Test [24]
+> 	Očekávaná hodnota: string
+> 	Reálná hodnota: string
+> 	OK!
+> Test [25]
+> 	Očekávaná hodnota: int
+> 	Reálná hodnota: int
+> 	OK!
+> Test [26]
+> 	Očekávaná hodnota: 
+> 	Reálná hodnota: 
+> 	OK!
+> Test [27]
+> 	Očekávaná hodnota: nil
+> 	Reálná hodnota: nil
+> 	OK!
+> Stack
+> Test [28]
+> 	Očekávaná hodnota: second_in
+> 	Reálná hodnota: second_in
+> 	OK!
+> Test [29]
+> 	Očekávaná hodnota: first_in
+> 	Reálná hodnota: first_in
+> 	OK!
+
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/ultra_test.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/ultra_test.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/ultra_test.src
+got rc | expected rc
+52    |	0
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/ultra_test.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/ultra_test.in
+
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GETCHAR/getchar_wrong_index.src
+got rc | expected rc
+53    |	58
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GETCHAR/getchar_wrong_index.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/GETCHAR/getchar_wrong_index.in
+
+[1;31mBad stdout[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/RETURN/return_backwards.src
+1c1
+< 42
+\ No newline at end of file
+---
+> 4269
+\ No newline at end of file
+
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/RETURN/return_backwards.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/RETURN/return_backwards.in
+[1;32mPASS[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/RETURN/return_nonexisting.src
+[1;31mBad stdout[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/RETURN/return_forward.src
+0a1
+> 42
+\ No newline at end of file
+
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/RETURN/return_forward.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/RETURN/return_forward.in
+
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_bool_string.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_bool_string.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_bool_string.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_string_nil.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_string_nil.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_string_nil.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_index.src
+got rc | expected rc
+0     |	58
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_index.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_index.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_string_string.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_string_string.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_string_string.in
+[1;31mBad stdout[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_symb.src
+1c1
+< yes
+\ No newline at end of file
+---
+> yns
+\ No newline at end of file
+
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_symb.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_symb.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_nil_nil.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_nil_nil.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_nil_nil.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_bool_nil.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_bool_nil.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_bool_nil.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_int_nil.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_int_nil.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_int_nil.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_string_bool.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_string_bool.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_string_bool.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_emptystr.src
+got rc | expected rc
+0     |	58
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_emptystr.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_emptystr.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_bool_bool.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_bool_bool.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_bool_bool.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_nil_bool.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_nil_bool.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_nil_bool.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_nil_int.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_nil_int.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_nil_int.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_nil_string.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_nil_string.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_nil_string.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_int_bool.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_int_bool.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_int_bool.in
+[1;31mBad stdout[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar.src
+1c1
+< yes
+\ No newline at end of file
+---
+> yns
+\ No newline at end of file
+
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_bool_int.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_bool_int.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_bool_int.in
+[1;31mBad stdout[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_vars.src
+1c1
+< yes
+\ No newline at end of file
+---
+> yen
+\ No newline at end of file
+
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_vars.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_vars.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_int_int.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_int_int.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_int_int.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_string_int.src
+got rc | expected rc
+0     |	53
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_string_int.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/SETCHAR/setchar_wrong_string_int.in
+
+[1;31mBad stdout[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_nil.src
+0a1
+> true
+\ No newline at end of file
+
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_nil.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_nil.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_nil.src
+got rc | expected rc
+53    |	0
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_nil.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_nil.in
+[1;31mBad stdout[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_string.src
+0a1
+> false
+\ No newline at end of file
+
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_string.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_string.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_string.src
+got rc | expected rc
+53    |	0
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_string.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_string.in
+
+[1;31mBad stdout[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_bool.src
+0a1
+> false
+\ No newline at end of file
+
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_bool.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_bool.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_bool.src
+got rc | expected rc
+53    |	0
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_bool.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_bool.in
+
+[1;31mBad stdout[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_int.src
+0a1
+> false
+\ No newline at end of file
+
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_int.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_int.in
+[1;31mBad RC[0m /homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_int.src
+got rc | expected rc
+53    |	0
+run this test with:
+php8.3 interpret.php --source=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_int.src --input=/homes/eva/xl/xlizic00/skola/ipp/ipp-core/tests/EQ/eq_nil_int.in
+
+PASSED: 310
+FAILED: 50

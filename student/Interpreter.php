@@ -20,7 +20,9 @@ use IPP\Student\Exception\SemanticException; // return code 52
 use IPP\Student\Exception\OperandTypeException; // return code 53
 use IPP\Student\Exception\VariableAccessException; // return code 54
 use IPP\Student\Exception\FrameAccessException; // return code 55
+use IPP\Student\Exception\ValueException; // return code 56
 use IPP\Student\Exception\OperandValueException; // return code 57
+use IPP\Student\Exception\StringOperationException; // return code 58
 use IPP\Student\Exception\ExitProgramException; // for opcode EXIT
 use IPP\Student\Instruction;
 use IPP\Student\ObjectsContainer\Frame;
@@ -41,6 +43,7 @@ class Interpreter extends AbstractInterpreter
     public int $positionOfInstruction = -1; // Stores position of current instruction in $instructionNumbers
     public mixed $frames = []; // Stores frames, initialization of frames in function initFrames()
     public Stack $framesStack; // Stores frames
+    public Stack $dataStack; // Stores frames
     public Stack $callStack; // Stores data of calling functions/labels
     public mixed $labels = []; // Stores defined labels ("name" => "position")
 
@@ -97,10 +100,13 @@ class Interpreter extends AbstractInterpreter
         } catch (OperandValueException $errMsg) {
             $this->stderr->writeString($errMsg);
             exit(ReturnCode::OPERAND_VALUE_ERROR); 
-        }catch (ExitProgramException $errMsg) {
+        } catch (ExitProgramException $errMsg) {
             exit($errMsg->returnCode); 
+        } catch (StringOperationException $errMsg) {
+            exit(ReturnCode::STRING_OPERATION_ERROR); 
+        } catch (ValueException $errMsg) {
+            exit(ReturnCode::VALUE_ERROR); 
         }
-
 
 
         return 0;
@@ -196,6 +202,9 @@ class Interpreter extends AbstractInterpreter
     {
 
         $this->framesStack = new Stack();
+        $this->callStack = new Stack();
+        $this->dataStack = new Stack();
+        
         $global = new Frame();
 
         $this->frames = [

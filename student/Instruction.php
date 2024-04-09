@@ -13,7 +13,9 @@ use IPP\Core\AbstractInterpreter;
 use IPP\Student\Exception\InvalidSourceStructureException; // return code 32
 use IPP\Student\Exception\SemanticException; // return code 52
 use IPP\Student\Exception\OperandTypeException; // return code 53
+use IPP\Student\Exception\ValueException; // return code 56
 use IPP\Student\Exception\OperandValueException; // return code 57
+use IPP\Student\Exception\StringOperationException; // return code 58
 use IPP\Student\Exception\ExitProgramException; // for opcode EXIT
 use IPP\Student\Argument;
 use IPP\Student\ObjectsContainer\Frame;
@@ -147,13 +149,13 @@ class Instruction
                 $this->execute_call();
                 break;
             case "RETURN":
-                // Handle RETURN operation
+                $this->execute_return();
                 break;
             case "PUSHS":
-                // Handle PUSHS operation
+                $this->execute_pushs();
                 break;
             case "POPS":
-                // Handle POPS operation
+                $this->execute_pops();
                 break;
             case "ADD":
                 $this->execute_add();
@@ -186,10 +188,10 @@ class Instruction
                 $this->execute_not();
                 break;
             case "INT2CHAR":
-                // Handle INT2CHAR operation
+                $this->execute_int2char();
                 break;
             case "STRI2INT":
-                // Handle STRI2INT operation
+                $this->execute_str2int();
                 break;
             case "READ":
                 $this->execute_read();
@@ -204,10 +206,10 @@ class Instruction
                 $this->execute_strlen();
                 break;
             case "GETCHAR":
-                // Handle GETCHAR operation
+                $this->execute_getchar();
                 break;
             case "SETCHAR":
-                // Handle SETCHAR operation
+                $this->execute_setchar();
                 break;
             case "TYPE":
                 // Handle TYPE operation
@@ -222,16 +224,16 @@ class Instruction
                 $this->execute_jumpifeq();
                 break;
             case "JUMPIFNEQ":
-                // Handle JUMPIFNEQ operation
+                $this->execute_jumpifneq();
                 break;
             case "EXIT":
                 $this->execute_exit();
                 break;
             case "DPRINT":
-                // Handle DPRINT operation
+                $this->execute_dprint();
                 break;
             case "BREAK":
-                // Handle BREAK operation
+                $this->execute_break();
                 break;      
             default:
                 throw new InvalidSourceStructureException("Wrong opcode `$this->opcode` given.");             
@@ -372,7 +374,7 @@ class Instruction
         }
 
         // Replace blank characters and convert ASCII chars
-        $str = str_replace(" ", "", $str);
+        $str = str_replace(" ", "", (string)$str);
         $str = str_replace("\n", "", $str);
         $str = $this->replaceAsciiChars($str);
 
@@ -395,7 +397,12 @@ class Instruction
 
         if($this->arg1->getType() == "var") {
 
-            $read = $this->interpreterPtr->input->readString();
+            if($this->arg2->getValue() == "string")
+                $read = $this->interpreterPtr->input->readString();
+            else if($this->arg2->getValue() == "bool")
+                $read = $this->interpreterPtr->input->readString();
+            else
+                $read = $this->interpreterPtr->input->readInt();
 
             // Read from frame
             $this->interpreterPtr->frames["GF"]->setVariable(
@@ -508,36 +515,15 @@ class Instruction
         $finalString = "";
 
         // Make final string
-        if($this->arg2->getType() == "var") {
-            if($this->arg2->getFirstValue() == "GF") {
-                $finalString .= $this->interpreterPtr->frames["GF"]->getVariable($this->arg2->getSecondValue());
-            }
-            else if($this->arg2->getFirstValue() == "TF") {
-                $finalString .= $this->interpreterPtr->frames["TF"]->getVariable($this->arg2->getSecondValue());
-            }
-            else if($this->arg2->getFirstValue() == "LF") {
-                $finalString .= $this->interpreterPtr->framesStack->peek()->getVariable($this->arg2->getSecondValue());
-            }
-        }
-        else {
-            $finalString .= $this->arg2->getValue();
-        }
+        $arg2DeepType = $this->arg2->getDeepType();
+        $arg3DeepType = $this->arg3->getDeepType();
+        $value1 = $this->arg2->getValue();
+        $value2 = $this->arg3->getValue();
+        
+        if($arg2DeepType != $arg3DeepType ||  $arg2DeepType == "nil" || $arg3DeepType == "nil" || $arg2DeepType == "bool" || $arg3DeepType == "bool" ||  $arg2DeepType == "int" || $arg3DeepType == "int")
+            throw new OperandTypeException("CONCAT must have same types.");
 
-        if($this->arg3->getType() == "var") {
-            if($this->arg3->getFirstValue() == "GF") {
-                $finalString .= $this->interpreterPtr->frames["GF"]->getVariable($this->arg3->getSecondValue());
-            }
-            else if($this->arg3->getFirstValue() == "TF") {
-                $finalString .= $this->interpreterPtr->frames["TF"]->getVariable($this->arg3->getSecondValue());
-            }
-            else if($this->arg3->getFirstValue() == "LF") {
-                $finalString .= $this->interpreterPtr->framesStack->peek()->getVariable($this->arg3->getSecondValue());
-            }
-        }
-        else {
-            $finalString .= $this->arg3->getValue();
-        }
-
+        $finalString = $value1 . $value2;
 
         // Choose frame
         if($this->arg1->getFirstValue() == "GF") {
@@ -596,15 +582,42 @@ class Instruction
     {
 
         // Check if their are the same type
-        /*if($this->arg1->getType() != $this->arg1->getType())
-            throw new SemanticException("JUMPIFEQ arguments must be the same type.");*/
+        if($this->arg2->getDeepType() != $this->arg3->getDeepType())
+            throw new OperandTypeException("JUMPIFEQ arguments must be the same type.");
 
         // Check if their are nil
         if($this->arg1->getType() == "nil" || $this->arg1->getType() == "nil")
             throw new SemanticException("`nil` can not be used in JUMPIFEQ operand.");
 
         // Jump if equal
-        if(strcmp($this->arg2->getValue(), $this->arg3->getValue())) {
+        if($this->arg2->getValue() == $this->arg3->getValue()) {
+            if (!isset($this->interpreterPtr->labels[$this->arg1->getValue()]))
+                throw new SemanticException("Label `".$this->arg1->getValue()."` do not exists.");
+            else {
+                $this->specialNextInstr = true;
+                $this->specialNextInstrNum = $this->interpreterPtr->labels[$this->arg1->getValue()];
+            }
+        }
+
+    }
+
+
+    /**
+     *  Execude JUMPIFNEQ
+     */
+    private function execute_jumpifneq() : void
+    {
+
+        // Check if their are the same type
+        if($this->arg2->getDeepType() != $this->arg3->getDeepType())
+            throw new OperandTypeException("JUMPIFEQ arguments must be the same type.");
+
+        // Check if their are nil
+        if($this->arg1->getType() == "nil" || $this->arg1->getType() == "nil")
+            throw new SemanticException("`nil` can not be used in JUMPIFEQ operand.");
+
+        // Jump if equal
+        if(!strcmp($this->arg2->getValue(), $this->arg3->getValue())) {
             if (!isset($this->interpreterPtr->labels[$this->arg1->getValue()]))
                 throw new SemanticException("Label `".$this->arg1->getValue()."` do not exists.");
             else {
@@ -661,8 +674,8 @@ class Instruction
      */
     private function execute_strlen() : void
     {
-        if($this->arg2->getType() == "int" || $this->arg2->getType() == "bool")
-            throw new OperandValueException("Can not use `int` or `bool` in STRLEN");
+        if($this->arg2->getDeepType() == "int" || $this->arg2->getDeepType() == "bool" || $this->arg2->getDeepType() == "nil")
+            throw new OperandTypeException("Can not use `int` or `bool` in STRLEN");
         
         $lenght = strlen($this->arg2->getValue());
 
@@ -1151,4 +1164,302 @@ class Instruction
         }        
 
     }
+
+
+    /**
+     *  Execute INT2CHAR
+     */
+    private function execute_int2char() : void
+    {
+
+        $arg2DeepType = $this->arg2->getDeepType();
+        $num = $this->arg2->getValue();
+
+        if($arg2DeepType != "int" && $num >= 0) {
+            throw new OperandTypeException("In INT2CHAR can not be `".$this->arg2->getDeepType()."`, can be only `int`");
+        }
+
+        // Transfer
+        $num = mb_chr($num);
+        if(empty($num))
+            throw new StringOperationException("In INT2CHAR is unicode, that do not represent any char.");
+
+
+        // Save
+        if($this->arg1->getFirstValue() == "GF") {
+            $this->interpreterPtr->frames["GF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $num, "bool"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "TF") {
+            $this->interpreterPtr->frames["TF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $num, "bool"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "LF") {
+            $this->interpreterPtr->framesStack->peek()->setVariable(
+                $this->arg1->getSecondValue(),
+                $num, "bool"
+            );
+        }  
+
+    }
+
+
+    /**
+     *  Execute STR2INT
+     */
+    private function execute_str2int() : void
+    {
+
+        $arg2DeepType = $this->arg2->getDeepType();
+        $arg3DeepType = $this->arg2->getDeepType();
+        $value = $this->arg2->getValue();
+        $pos = $this->arg3->getValue();
+
+
+        if($arg2DeepType != "int" && $arg3DeepType != "int") {
+            throw new OperandTypeException("In STR2INT can not be `".$this->arg2->getDeepType()."`, can be only `string`");
+        }
+
+        // Transfer
+        $value = mb_substr($value, (int)$pos, 1, 'UTF-8');
+
+        if(empty($value))
+            throw new StringOperationException("In STR2INT is char that do not represent any UNICODE integer.");
+
+
+        // Save
+        if($this->arg1->getFirstValue() == "GF") {
+            $this->interpreterPtr->frames["GF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $value, "bool"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "TF") {
+            $this->interpreterPtr->frames["TF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $value, "bool"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "LF") {
+            $this->interpreterPtr->framesStack->peek()->setVariable(
+                $this->arg1->getSecondValue(),
+                $value, "bool"
+            );
+        }  
+
+    }
+
+
+    /**
+     *  Execute GETCHAR
+     */
+    private function execute_getchar() : void
+    {
+
+        $arg2DeepType = $this->arg2->getDeepType();
+        $arg3DeepType = $this->arg3->getDeepType();
+        $value = $this->arg2->getValue();
+        $pos = $this->arg3->getValue();
+
+
+        if($arg2DeepType != "string" || $arg3DeepType != "int") {
+            throw new OperandTypeException("In GETCHAR can not be `".$this->arg2->getDeepType()."`, can be only `string`");
+        }
+
+        // Transfer
+        $value = mb_substr($value, (int)$pos, 1, 'UTF-8');
+
+        if(empty($value))
+            throw new OperandTypeException("In STR2INT is char that do not represent any UNICODE integer.");
+
+
+        // Save
+        if($this->arg1->getFirstValue() == "GF") {
+            $this->interpreterPtr->frames["GF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $value, "bool"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "TF") {
+            $this->interpreterPtr->frames["TF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $value, "bool"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "LF") {
+            $this->interpreterPtr->framesStack->peek()->setVariable(
+                $this->arg1->getSecondValue(),
+                $value, "bool"
+            );
+        }    
+
+    }
+
+
+    /**
+     *  Execute SETCHAR
+     */
+    private function execute_setchar() : void
+    {
+
+   
+
+    }
+
+
+    /**
+     *  Execute TYPE
+     */
+    private function execute_type() : void
+    {
+
+        $type = $this->arg2->getType();
+
+        // Save
+        if($this->arg1->getFirstValue() == "GF") {
+            $this->interpreterPtr->frames["GF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $type, "string"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "TF") {
+            $this->interpreterPtr->frames["TF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $type, "string"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "LF") {
+            $this->interpreterPtr->framesStack->peek()->setVariable(
+                $this->arg1->getSecondValue(),
+                $type, "string"
+            );
+        }  
+
+
+    }
+
+
+    /**
+     *  Execute DPRINT 
+     */
+    private function execute_dprint() : void
+    {
+
+        $str = "";
+
+        // Choose by type
+        if($this->arg1->getType() == "bool") {
+            $str = $this->arg1->getValue();
+        }
+        else if($this->arg1->getType() == "nil") {
+            $str = "";
+        }
+        else if($this->arg1->getType() == "var") {
+
+            // Choose frame
+            if($this->arg1->getFirstValue() == "GF") {
+                $str = $this->interpreterPtr->frames["GF"]->getVariable($this->arg1->getSecondValue());
+            }
+            else if($this->arg1->getFirstValue() == "TF") {
+                $str = $this->interpreterPtr->frames["TF"]->getVariable($this->arg1->getSecondValue()); 
+            }
+            else if($this->arg1->getFirstValue() == "LF") {
+                $str = $this->interpreterPtr->framesStack->peek()->getVariable($this->arg1->getSecondValue());
+            }
+
+        }
+        else {
+            $str = $this->arg1->getValue();
+        }
+
+        // Replace blank characters and convert ASCII chars
+        $str = str_replace(" ", "", (string)$str);
+        $str = str_replace("\n", "", $str);
+        $str = $this->replaceAsciiChars($str);
+
+        // Write string
+        $this->interpreterPtr->stderr->writeString($str);
+
+    }
+
+
+    /**
+     *  Execute BREAK 
+     */
+    private function execute_break() : void
+    {
+
+        $this->interpreterPtr->stderr->writeString("\nPosition in code: ".$this->order."\nGlobal frame values: ");
+        $this->interpreterPtr->stderr->writeString($this->interpreterPtr->frames["GF"]->flush()."\n\n");
+
+    }
+
+
+    /**
+     *  Execute RETURN
+     */
+    private function execute_return()
+    {
+
+        if ($this->interpreterPtr->callStack->size() == 0)
+            throw new ValueException("No place to jump.");
+        else {
+            $jumpPos = $this->interpreterPtr->callStack->pop();
+
+            $this->specialNextInstr = true;
+            $this->specialNextInstrNum = $jumpPos;
+        }
+
+    }
+
+
+    /**
+     *  Execute PUSHS
+     */
+    private function execute_pushs() : void
+    {
+
+        $this->interpreterPtr->dataStack->push($this->arg1->getValue());
+
+    }
+
+
+    /**
+     *  Execute POPS
+     */
+    private function execute_pops() : void
+    {
+
+        if ($this->interpreterPtr->dataStack->size() == 0)
+            throw new ValueException("No data to pop.");
+
+        $data = $this->interpreterPtr->dataStack->pop();
+
+        // Save
+        if($this->arg1->getFirstValue() == "GF") {
+            
+            $this->interpreterPtr->frames["GF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $data, $this->arg1->getType()
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "TF") {
+            $this->interpreterPtr->frames["TF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $data, $this->arg1->getType()
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "LF") {
+            $this->interpreterPtr->framesStack->peek()->setVariable(
+                $this->arg1->getSecondValue(),
+                $data, $this->arg1->getType()
+            );
+        }    
+
+    }
+    
 }

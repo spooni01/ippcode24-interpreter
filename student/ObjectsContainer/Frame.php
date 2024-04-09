@@ -26,6 +26,18 @@ class Frame
 
 
     /**
+     *  Print variables on stderr
+     */
+    public function flush() : string
+    {
+        
+        $string = implode(" | ", $this->variables);
+        return $string;
+
+    }
+
+
+    /**
      *  Check if the frame has a variable with the given name
      */
     public function hasVariable(string $name): bool
