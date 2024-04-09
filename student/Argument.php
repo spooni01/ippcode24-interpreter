@@ -56,29 +56,74 @@ class Argument
 
 
     /**
+     *  Get deep type
+     */
+    public function getDeepType() : string
+    {
+
+        if($this->type == "var") {
+            $tmpValue = $this->value;
+            $tmpType = "";
+            
+            while(preg_match("/(GF|TF|LF)@(\\S+)/", $tmpValue, $matches)) {
+                if($matches[1] == "GF") {
+                    $tmpValue = $this->instructionPtr->interpreterPtr->frames["GF"]->getVariable(
+                        $matches[2] 
+                    );  
+                    $tmpType = $this->instructionPtr->interpreterPtr->frames["GF"]->getType(
+                        $matches[2] 
+                    );                      
+
+                }
+                else if($matches[1] == "TF") {
+                    $tmpValue = $this->instructionPtr->interpreterPtr->frames["TF"]->getVariable(
+                        $matches[2] 
+                    );  
+                    $tmpType = $this->instructionPtr->interpreterPtr->frames["GF"]->getType(
+                        $matches[2] 
+                    );  
+                }
+                else if($matches[1] == "LF") {
+                    $tmpValue = $this->instructionPtr->interpreterPtr->framesStack->peek()->getVariable(
+                        $matches[2]
+                    );
+                    $tmpType = $this->instructionPtr->interpreterPtr->frames["GF"]->getType(
+                        $matches[2] 
+                    );  
+                }
+            }
+
+            return $tmpType;
+        }
+        else
+            return $this->type;
+
+    }
+
+
+    /**
      *  Get value
      */
     public function getValue() : mixed
     {
 
         if($this->type == "var") {
-            $tmpValue = "";
-            $this->tmpType = $this->type;
+            $tmpValue = $this->value;
             
-            while($this->type == "var") {
-                if($this->getFirstValue() == "GF") {
+            while(preg_match("/(GF|TF|LF)@(\\S+)/", $tmpValue, $matches)) {
+                if($matches[1] == "GF") {
                     $tmpValue = $this->instructionPtr->interpreterPtr->frames["GF"]->getVariable(
-                        $this->getSecondValue() 
+                        $matches[2] 
                     );  
                 }
-                else if($this->getFirstValue() == "TF") {
+                else if($matches[1] == "TF") {
                     $tmpValue = $this->instructionPtr->interpreterPtr->frames["TF"]->getVariable(
-                        $this->getSecondValue() 
+                        $matches[2] 
                     );  
                 }
-                else if($this->getFirstValue() == "LF") {
+                else if($matches[1] == "LF") {
                     $tmpValue = $this->instructionPtr->interpreterPtr->framesStack->peek()->getVariable(
-                        $this->getSecondValue()
+                        $matches[2]
                     );
                 }
 
@@ -97,7 +142,7 @@ class Argument
 
     }
 
-
+    
     /**
      *  Checks if type of argument are correct
      */

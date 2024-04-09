@@ -71,8 +71,6 @@ class Interpreter extends AbstractInterpreter
                     $this->positionOfInstruction--; // Instruction function will return correct number, so it must be deacresed by 1 because at the beginning of another while cycle it will by instantly increased by 1
                 }
 
-                // TODO1: Implement operands
-                // TODO3: check assignment, make documentation (f.e. check if <program> has correct attributes and values)
             }
 
         } catch (XMLException $errMsg) {

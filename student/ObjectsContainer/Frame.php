@@ -11,7 +11,7 @@ class Frame
 {
 
     private mixed $variables = [];
-    private mixed $types = [];
+    public mixed $types = [];
 
 
     /**
@@ -93,7 +93,6 @@ class Frame
 
         $this->variables[$name] = $value;
         $this->types[$name] = $type;
-
 
     }
 

@@ -156,34 +156,34 @@ class Instruction
                 // Handle POPS operation
                 break;
             case "ADD":
-                // Handle ADD operation
+                $this->execute_add();
                 break;
             case "SUB":
-                // Handle SUB operation
+                $this->execute_sub();
                 break;
             case "MUL":
-                // Handle MUL operation
+                $this->execute_mul();
                 break;
             case "IDIV":
-                // Handle IDIV operation
+                $this->execute_idiv();
                 break;
             case "LT":
-                // Handle LT operation
+                $this->execute_lt();
                 break;
             case "GT":
-                // Handle GT operation
+                $this->execute_gt();
                 break;
             case "EQ":
-                // Handle EQ operation
+                $this->execute_eq();
                 break;
             case "AND":
-                // Handle AND operation
+                $this->execute_and();
                 break;
             case "OR":
-                // Handle OR operation
+                $this->execute_or();
                 break;
             case "NOT":
-                // Handle NOT operation
+                $this->execute_not();
                 break;
             case "INT2CHAR":
                 // Handle INT2CHAR operation
@@ -444,19 +444,19 @@ class Instruction
         if($this->arg1->getFirstValue() == "GF") {
             $this->interpreterPtr->frames["GF"]->setVariable(
                 $this->arg1->getSecondValue(), 
-                $str, $this->arg1->getType()
+                $str, $this->arg2->getType()
             );  
         }
         else if($this->arg1->getFirstValue() == "TF") {
             $this->interpreterPtr->frames["TF"]->setVariable(
                 $this->arg1->getSecondValue(), 
-                $str, $this->arg1->getType()
+                $str, $this->arg2->getType()
             );  
         }
         else if($this->arg1->getFirstValue() == "LF") {
             $this->interpreterPtr->framesStack->peek()->setVariable(
                 $this->arg1->getSecondValue(),
-                $str, $this->arg1->getType()
+                $str, $this->arg2->getType()
             );
         }
          
@@ -670,19 +670,19 @@ class Instruction
         if($this->arg1->getFirstValue() == "GF") {
             $this->interpreterPtr->frames["GF"]->setVariable(
                 $this->arg1->getSecondValue(), 
-                $lenght, $this->arg1->getType()
+                $lenght, "string"
             );  
         }
         else if($this->arg1->getFirstValue() == "TF") {
             $this->interpreterPtr->frames["TF"]->setVariable(
                 $this->arg1->getSecondValue(), 
-                $lenght, $this->arg1->getType()
+                $lenght, "string"
             );  
         }
         else if($this->arg1->getFirstValue() == "LF") {
             $this->interpreterPtr->framesStack->peek()->setVariable(
                 $this->arg1->getSecondValue(),
-                $lenght, $this->arg1->getType()
+                $lenght, "string"
             );
         }
 
@@ -691,5 +691,464 @@ class Instruction
     }
     
 
+    /**
+     *  Execute ADD
+     */
+    private function execute_add() : void
+    {
 
+        if($this->arg2->getDeepType() != "int" || $this->arg3->getDeepType() != "int") {
+            throw new OperandTypeException("In ADD must be only integers, you have `".$this->arg2->getDeepType()."` and `".$this->arg3->getDeepType()."`");
+        }
+
+        $result = (int)$this->arg2->getValue() + (int)$this->arg3->getValue();
+
+        // Save
+        if($this->arg1->getFirstValue() == "GF") {
+            $this->interpreterPtr->frames["GF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $result, "int"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "TF") {
+            $this->interpreterPtr->frames["TF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $result, "int"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "LF") {
+            $this->interpreterPtr->framesStack->peek()->setVariable(
+                $this->arg1->getSecondValue(),
+                $result, "int"
+            );
+        }        
+
+    }
+        
+
+    /**
+     *  Execute SUB
+     */
+    private function execute_sub() : void
+    {
+
+        if($this->arg2->getDeepType() != "int" || $this->arg3->getDeepType() != "int") {
+            throw new OperandTypeException("In SUB must be only integers, you have `".$this->arg2->getDeepType()."` and `".$this->arg3->getDeepType()."`");
+        }
+
+        $result = (int)$this->arg3->getValue() - (int)$this->arg2->getValue();
+
+        // Save
+        if($this->arg1->getFirstValue() == "GF") {
+            $this->interpreterPtr->frames["GF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $result, "int"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "TF") {
+            $this->interpreterPtr->frames["TF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $result, "int"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "LF") {
+            $this->interpreterPtr->framesStack->peek()->setVariable(
+                $this->arg1->getSecondValue(),
+                $result, "int"
+            );
+        }        
+
+    }
+            
+
+    /**
+     *  Execute MUL
+     */
+    private function execute_mul() : void
+    {
+
+        if($this->arg2->getDeepType() != "int" || $this->arg3->getDeepType() != "int") {
+            throw new OperandTypeException("In MUL must be only integers, you have `".$this->arg2->getDeepType()."` and `".$this->arg3->getDeepType()."`");
+        }
+
+        $result = (int)$this->arg3->getValue() * (int)$this->arg2->getValue();
+
+        // Save
+        if($this->arg1->getFirstValue() == "GF") {
+            $this->interpreterPtr->frames["GF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $result, "int"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "TF") {
+            $this->interpreterPtr->frames["TF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $result, "int"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "LF") {
+            $this->interpreterPtr->framesStack->peek()->setVariable(
+                $this->arg1->getSecondValue(),
+                $result, "int"
+            );
+        }        
+
+    }
+            
+
+    /**
+     *  Execute IDIV
+     */
+    private function execute_idiv() : void
+    {
+
+        if($this->arg2->getDeepType() != "int" || $this->arg3->getDeepType() != "int") {
+            throw new OperandTypeException("In IDIV must be only integers, you have `".$this->arg2->getDeepType()."` and `".$this->arg3->getDeepType()."`");
+        }
+
+        if((int)$this->arg3->getValue() == 0) {
+            throw new OperandValueException("Can not divide by zero.");
+        }
+
+        $result = (int)$this->arg2->getValue() / (int)$this->arg3->getValue();
+
+        // Save
+        if($this->arg1->getFirstValue() == "GF") {
+            $this->interpreterPtr->frames["GF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $result, "int"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "TF") {
+            $this->interpreterPtr->frames["TF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $result, "int"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "LF") {
+            $this->interpreterPtr->framesStack->peek()->setVariable(
+                $this->arg1->getSecondValue(),
+                $result, "int"
+            );
+        }        
+
+    }
+                
+
+    /**
+     *  Execute LT
+     */
+    private function execute_lt() : void
+    {
+
+        $arg2DeepType = $this->arg2->getDeepType();
+
+        if($arg2DeepType != $this->arg3->getDeepType() || $this->arg2->getDeepType() == "nil") {
+            throw new OperandTypeException("In LT can not be `".$this->arg2->getDeepType()."` or `".$this->arg3->getDeepType()."`");
+        }
+
+        // Check which is result
+        if($arg2DeepType == "string") {
+            if(strlen($this->arg2->getValue()) < strlen($this->arg3->getValue())) {
+                $result = "true";
+            }
+            else {
+                $result = "false";
+            }
+        }
+        else if($arg2DeepType == "bool") {
+            if($this->arg2->getValue() == "false") {
+                $result = "true";
+            }
+            else {
+                $result = "false";
+            }
+        }
+        else {
+            if((int)$this->arg2->getValue() < (int)$this->arg3->getValue()) {
+                $result = "true";
+            }
+            else {
+                $result = "false";
+            }
+        }
+
+        // Save
+        if($this->arg1->getFirstValue() == "GF") {
+            $this->interpreterPtr->frames["GF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $result, "bool"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "TF") {
+            $this->interpreterPtr->frames["TF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $result, "bool"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "LF") {
+            $this->interpreterPtr->framesStack->peek()->setVariable(
+                $this->arg1->getSecondValue(),
+                $result, "bool"
+            );
+        }        
+
+    }
+                
+
+    /**
+     *  Execute GT
+     */
+    private function execute_gt() : void
+    {
+
+        $arg2DeepType = $this->arg2->getDeepType();
+        $arg3DeepType = $this->arg3->getDeepType();
+
+        if($arg2DeepType != $arg3DeepType && $arg2DeepType != "nil" && $arg3DeepType != "nil") {
+            throw new OperandTypeException("In LT can not be `".$this->arg2->getDeepType()."` or `".$this->arg3->getDeepType()."`");
+        }
+
+        // Check which is result
+        if($arg2DeepType == "string") {
+            if(strlen($this->arg2->getValue()) > strlen($this->arg3->getValue())) {
+                $result = "true";
+            }
+            else {
+                $result = "false";
+            }
+        }
+        else if($arg2DeepType == "bool") {
+            if($this->arg2->getValue() == "true") {
+                $result = "true";
+            }
+            else {
+                $result = "false";
+            }
+        }
+        else {
+            if((int)$this->arg2->getValue() > (int)$this->arg3->getValue()) {
+                $result = "true";
+            }
+            else {
+                $result = "false";
+            }
+        }
+
+        // Save
+        if($this->arg1->getFirstValue() == "GF") {
+            $this->interpreterPtr->frames["GF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $result, "bool"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "TF") {
+            $this->interpreterPtr->frames["TF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $result, "bool"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "LF") {
+            $this->interpreterPtr->framesStack->peek()->setVariable(
+                $this->arg1->getSecondValue(),
+                $result, "bool"
+            );
+        }        
+
+    }
+                
+
+    /**
+     *  Execute EQ
+     */
+    private function execute_eq() : void
+    {
+
+        $arg2DeepType = $this->arg2->getDeepType();
+
+        if($arg2DeepType != $this->arg3->getDeepType() || $this->arg2->getDeepType() == "nil") {
+            throw new OperandTypeException("In LT can not be `".$this->arg2->getDeepType()."` or `".$this->arg3->getDeepType()."`");
+        }
+
+        // Check which is result
+        if($arg2DeepType == "string") {
+            if(strlen($this->arg2->getValue()) == strlen($this->arg3->getValue())) {
+                $result = "true";
+            }
+            else {
+                $result = "false";
+            }
+        }
+        else if($arg2DeepType == "bool") {
+            if($this->arg2->getValue() == $this->arg3->getValue()) {
+                $result = "true";
+            }
+            else {
+                $result = "false";
+            }
+        }
+        else {
+            if((int)$this->arg2->getValue() == (int)$this->arg3->getValue()) {
+                $result = "true";
+            }
+            else {
+                $result = "false";
+            }
+        }
+
+        // Save
+        if($this->arg1->getFirstValue() == "GF") {
+            $this->interpreterPtr->frames["GF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $result, "bool"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "TF") {
+            $this->interpreterPtr->frames["TF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $result, "bool"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "LF") {
+            $this->interpreterPtr->framesStack->peek()->setVariable(
+                $this->arg1->getSecondValue(),
+                $result, "bool"
+            );
+        }        
+
+    }
+
+
+    /**
+     *  Execute AND
+     */
+    private function execute_and() : void
+    {
+
+        $arg2DeepType = $this->arg2->getDeepType();
+        $arg3DeepType = $this->arg3->getDeepType();
+
+        if($arg2DeepType != "bool" || $arg3DeepType != "bool") {
+            throw new OperandTypeException("In AND can not be `".$this->arg2->getDeepType()."` or `".$this->arg3->getDeepType()."`, can be only `bool`");
+        }
+
+        
+        if($this->arg2->getValue() == "true" && $this->arg3->getValue() == "true") {
+                $result = "true";
+        }
+        else {
+            $result = "false";
+        }
+        
+
+        // Save
+        if($this->arg1->getFirstValue() == "GF") {
+            $this->interpreterPtr->frames["GF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $result, "bool"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "TF") {
+            $this->interpreterPtr->frames["TF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $result, "bool"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "LF") {
+            $this->interpreterPtr->framesStack->peek()->setVariable(
+                $this->arg1->getSecondValue(),
+                $result, "bool"
+            );
+        }        
+
+    }
+
+    
+    /**
+     *  Execute OR
+     */
+    private function execute_or() : void
+    {
+
+        $arg2DeepType = $this->arg2->getDeepType();
+        $arg3DeepType = $this->arg3->getDeepType();
+
+        if($arg2DeepType != "bool" || $arg3DeepType != "bool") {
+            throw new OperandTypeException("In OR can not be `".$this->arg2->getDeepType()."` or `".$this->arg3->getDeepType()."`, can be only `bool`");
+        }
+
+        
+        if($this->arg2->getValue() == "true" || $this->arg3->getValue() == "true") {
+                $result = "true";
+        }
+        else {
+            $result = "false";
+        }
+        
+
+        // Save
+        if($this->arg1->getFirstValue() == "GF") {
+            $this->interpreterPtr->frames["GF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $result, "bool"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "TF") {
+            $this->interpreterPtr->frames["TF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $result, "bool"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "LF") {
+            $this->interpreterPtr->framesStack->peek()->setVariable(
+                $this->arg1->getSecondValue(),
+                $result, "bool"
+            );
+        }        
+
+    }
+
+    
+    /**
+     *  Execute NOT
+     */
+    private function execute_not() : void
+    {
+
+        $arg2DeepType = $this->arg2->getDeepType();
+
+        if($arg2DeepType != "bool") {
+            throw new OperandTypeException("In NOT can not be `".$this->arg2->getDeepType()."`, can be only `bool`");
+        }
+
+        
+        if($this->arg2->getValue() == "true") {
+                $result = "false";
+        }
+        else {
+            $result = "true";
+        }
+        
+
+        // Save
+        if($this->arg1->getFirstValue() == "GF") {
+            $this->interpreterPtr->frames["GF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $result, "bool"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "TF") {
+            $this->interpreterPtr->frames["TF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $result, "bool"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "LF") {
+            $this->interpreterPtr->framesStack->peek()->setVariable(
+                $this->arg1->getSecondValue(),
+                $result, "bool"
+            );
+        }        
+
+    }
 }
