@@ -1,9 +1,10 @@
 <?php
 
-namespace IPP\Student;
+namespace IPP\Student\ObjectsContainer;
 
 // Internal
 use IPP\Student\Exception\InvalidSourceStructureException; // return code 32
+use IPP\Student\Exception\FrameAccessException; // return code 55
 
 
 class Stack
@@ -17,6 +18,11 @@ class Stack
     public function push(mixed $item) : void
     {
 
+        if($item == NULL) {
+            throw new FrameAccessException("Frame is not created.");
+        }
+
+
         array_unshift($this->items, $item);
 
     }
@@ -29,7 +35,7 @@ class Stack
     {
 
         if ($this->isEmpty()) {
-            throw new InvalidSourceStructureException("Stack is empty.");
+            throw new FrameAccessException("Stack is empty.");
         }
 
         return array_shift($this->items);

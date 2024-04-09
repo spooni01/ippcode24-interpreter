@@ -27,6 +27,9 @@ stan:
 test:
 	python3.8 TESTS/supplementary-tests/test-int.py
 
+testold:
+	bash ./tests/test.sh
+
 run-help: interpret.php
 	if [ "${HOSTNAME}" = "merlin.fit.vutbr.cz" ]; then php8.3 $(SCRIPT) --help; else php $(SCRIPT) --help; fi
 

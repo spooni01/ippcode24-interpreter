@@ -9,12 +9,23 @@ use DOMElement;
 // Devcontainer
 use IPP\Core\AbstractInterpreter;
 use IPP\Core\ReturnCode;
+use IPP\Core\Interface\InputReader;
+use IPP\Core\Interface\OutputWriter;
 use IPP\Core\Exception\XMLException; // return code 31
 use IPP\Core\Exception\IntegrationException; // return code 88
 
 // Internal
 use IPP\Student\Exception\InvalidSourceStructureException; // return code 32
+use IPP\Student\Exception\SemanticException; // return code 52
+use IPP\Student\Exception\OperandTypeException; // return code 53
+use IPP\Student\Exception\VariableAccessException; // return code 54
+use IPP\Student\Exception\FrameAccessException; // return code 55
+use IPP\Student\Exception\OperandValueException; // return code 57
+use IPP\Student\Exception\ExitProgramException; // for opcode EXIT
 use IPP\Student\Instruction;
+use IPP\Student\ObjectsContainer\Frame;
+use IPP\Student\ObjectsContainer\Stack;
+use IPP\Student\Argument;
 
 
 /*
@@ -23,9 +34,15 @@ use IPP\Student\Instruction;
 class Interpreter extends AbstractInterpreter
 {
 
+    public InputReader $input; // Public to use it in class Instruction as pointer
+    public OutputWriter $stdout; // Public to use it in class Instruction as pointer
+    public OutputWriter $stderr; // Public to use it in class Instruction as pointer
     private mixed $instructionNumbers = []; // Stores order numbers
-    private int $positionOfInstruction = -1; // Stores position of current instruction in $instructionNumbers
-
+    public int $positionOfInstruction = -1; // Stores position of current instruction in $instructionNumbers
+    public mixed $frames = []; // Stores frames, initialization of frames in function initFrames()
+    public Stack $framesStack; // Stores frames
+    public Stack $callStack; // Stores data of calling functions/labels
+    public mixed $labels = []; // Stores defined labels ("name" => "position")
 
     /*
      * Main function
@@ -37,6 +54,7 @@ class Interpreter extends AbstractInterpreter
 
             $dom = $this->source->getDOMDocument(); // Get XML   
             $this->processOrderNumbers($dom); // Process order numbers
+            $this->initFrames();
 
             // Loop through instructions by order number
             while ($this->positionOfInstruction < (count($this->instructionNumbers) - 1) ) {
@@ -45,18 +63,16 @@ class Interpreter extends AbstractInterpreter
                 $xmlInstr = $this->foundInstructionByOrderNumber($dom->documentElement); // Get instruction by its order number ($this->positionOfInstruction)
 
                 // Parse and execute instruction with order number $this->instructionNumbers
-                $instr = new Instruction($xmlInstr, $this->instructionNumbers[$this->positionOfInstruction]);
+                $instr = new Instruction($xmlInstr, (int)str_replace(" ", "", $this->instructionNumbers[$this->positionOfInstruction]), $this);
 
                 // If next instruction is special, set it to its position number
                 if($instr->isNextPositionSpecial()) {
                     $this->positionOfInstruction = $instr->getNextSpecialInstruction();
                     $this->positionOfInstruction--; // Instruction function will return correct number, so it must be deacresed by 1 because at the beginning of another while cycle it will by instantly increased by 1
                 }
-                // TODO1: Create Frame
-                // TODO2: Implement operands
-                // TODO2: errcodes
-                // TODO3: check assignment, make documentation (f.e. check if <program> has correct attributes and values)
 
+                // TODO1: Implement operands
+                // TODO3: check assignment, make documentation (f.e. check if <program> has correct attributes and values)
             }
 
         } catch (XMLException $errMsg) {
@@ -68,7 +84,26 @@ class Interpreter extends AbstractInterpreter
         } catch (IntegrationException $errMsg) {
             $this->stderr->writeString($errMsg);
             exit(ReturnCode::INTEGRATION_ERROR); 
+        } catch (SemanticException $errMsg) {
+            $this->stderr->writeString($errMsg);
+            exit(ReturnCode::SEMANTIC_ERROR); 
+        } catch (VariableAccessException $errMsg) {
+            $this->stderr->writeString($errMsg);
+            exit(ReturnCode::VARIABLE_ACCESS_ERROR); 
+        } catch (FrameAccessException $errMsg) {
+            $this->stderr->writeString($errMsg);
+            exit(ReturnCode::FRAME_ACCESS_ERROR); 
+        } catch (OperandTypeException $errMsg) {
+            $this->stderr->writeString($errMsg);
+            exit(ReturnCode::OPERAND_TYPE_ERROR); 
+        } catch (OperandValueException $errMsg) {
+            $this->stderr->writeString($errMsg);
+            exit(ReturnCode::OPERAND_VALUE_ERROR); 
+        }catch (ExitProgramException $errMsg) {
+            exit($errMsg->returnCode); 
         }
+
+
 
         return 0;
 
@@ -87,12 +122,22 @@ class Interpreter extends AbstractInterpreter
             if ($instr->nodeType === XML_ELEMENT_NODE) {
                 
                 // Check if numbers are bigger or equal 0
-                $orderNum = $instr->getAttribute("order"); /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
-
+                $orderNum = str_replace(" ", "", $instr->getAttribute("order")); /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
                 if (!ctype_digit($orderNum)) 
                     throw new InvalidSourceStructureException("Parameter `order` must be integer bigger or equal than zero.");     
                 else
                     array_push($this->instructionNumbers, $orderNum); 
+                
+                // Save label name with order num
+                if(strtoupper((string)$instr->getAttribute('opcode')) == "LABEL") { /** @phpstan-ignore-line */ // PHP STAN writes that getAttribute is undefined, but it is defined
+                    $tmpInstr = new Instruction($instr, (int)$orderNum, $this); /** @phpstan-ignore-line */ // $instr is DOMElement
+
+                    if (isset($this->labels[$tmpInstr->getArg1()->getValue()])) 
+                        throw new SemanticException("Label already exists.");
+                    else {
+                        $this->labels[$tmpInstr->getArg1()->getValue()] = $orderNum;
+                    }
+                }
             
             }
         }
@@ -130,9 +175,10 @@ class Interpreter extends AbstractInterpreter
 
             if ($instr->nodeType == XML_ELEMENT_NODE && $instr->tagName == 'instruction') { /** @phpstan-ignore-line */ // phpstan was throwing error that $tagName do not exists, but it exists
                 
-                if ((int)$instr->getAttribute('order') == $this->instructionNumbers[$this->positionOfInstruction]) /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
+                if ((int)str_replace(" ", "", $instr->getAttribute('order')) == $this->instructionNumbers[$this->positionOfInstruction]) /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
                     return $instr; /** @phpstan-ignore-line */ // phpstan was throwing error that this returns DOMNode, but it returns DOMElement
-
+                
+ 
             }
 
         }
@@ -142,6 +188,23 @@ class Interpreter extends AbstractInterpreter
         $tmp = new DOMElement("x");
         return $tmp;
     
+    }
+
+
+    /**
+     *  Init of frames
+     */
+    private function initFrames() : void
+    {
+
+        $this->framesStack = new Stack();
+        $global = new Frame();
+
+        $this->frames = [
+            "GF" => $global,
+            "TF" => NULL
+        ];
+
     }
 
 

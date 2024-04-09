@@ -1,15 +1,17 @@
 <?php
 
-namespace IPP\Student;
+namespace IPP\Student\ObjectsContainer;
 
 // Internal
-use IPP\Student\Exception\InvalidSourceStructureException; // return code 32
+use IPP\Student\Exception\SemanticException; // return code 52
+use IPP\Student\Exception\VariableAccessException; // return code 54
 
 
 class Frame
 {
 
     private mixed $variables = [];
+    private mixed $types = [];
 
 
     /**
@@ -41,10 +43,25 @@ class Frame
     {
 
         if (!$this->hasVariable($name)) {
-            throw new InvalidSourceStructureException("Variable '$name' does not exist in this frame.");
+            throw new SemanticException("Variable '$name' does not exist in this frame.");
         }
 
         return $this->variables[$name];
+
+    }
+
+
+    /**
+     *  Get the type of the variable with the given name
+     */
+    public function getType(string $name) : mixed
+    {
+
+        if (!$this->hasVariable($name)) {
+            throw new SemanticException("Variable '$name' does not exist in this frame.");
+        }
+
+        return $this->types[$name];
 
     }
 
@@ -56,7 +73,7 @@ class Frame
     {
 
         if ($this->hasVariable($name)) {
-            throw new InvalidSourceStructureException("Variable '$name' is already defined in this frame.");
+            throw new SemanticException("Variable '$name' is already defined in this frame.");
         }
 
         $this->variables[$name] = null;
@@ -67,14 +84,16 @@ class Frame
     /**
      *  Set the value of the variable with the given name
      */
-    public function setVariable(string $name, mixed $value) : void
+    public function setVariable(string $name, mixed $value, string $type) : void
     {
 
         if (!$this->hasVariable($name)) {
-            throw new InvalidSourceStructureException("Variable '$name' does not exist in this frame.");
+            throw new VariableAccessException("Variable '$name' does not exist in this frame.");
         }
 
         $this->variables[$name] = $value;
+        $this->types[$name] = $type;
+
 
     }
 
@@ -86,10 +105,11 @@ class Frame
     {
 
         if (!$this->hasVariable($name)) {
-            throw new InvalidSourceStructureException("Variable '$name' does not exist in this frame.");
+            throw new SemanticException("Variable '$name' does not exist in this frame.");
         }
 
         unset($this->variables[$name]);
+        unset($this->types[$name]);
 
     }
 

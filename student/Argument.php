@@ -8,6 +8,7 @@ use IPP\Core\AbstractInterpreter;
 
 // Internal
 use IPP\Student\Exception\InvalidSourceStructureException; // return code 32
+use IPP\Student\Instruction;
 
 
 class Argument 
@@ -16,119 +17,167 @@ class Argument
     private mixed $type;
     private mixed $value;
     private string $argPattern;
+    private Instruction $instructionPtr;
+    public string $tmpType; // Stores last type of found operand in while loop
 
     /*
      *  Constructor
      */
-    public function __construct(string $unprocessedOperand, string $argPattern)
+    public function __construct(string $value, string $type, string $argPattern, Instruction $instructionPtr)
     {
 
+        // Clean $value
+        $value = str_replace("\n", "", $value);
+        $value = str_replace(" ", "", $value);
+
+        // Setters
+        $this->value = $value;
+        $this->type = $type;
         $this->argPattern = $argPattern;
+        $this->instructionPtr = $instructionPtr;
 
-        if ($argPattern === "var") {
-            $this->processVar($unprocessedOperand);
-        } elseif ($argPattern === "symb") {
-            $this->processSymb($unprocessedOperand);
-        } elseif ($argPattern === "label") {
-            $this->processLabel($unprocessedOperand);
-        } elseif ($argPattern === "type") {
-            $this->processType($unprocessedOperand);
-        } else {
-            throw new InvalidSourceStructureException("Invalid argument pattern: $argPattern");
+        // Check if type is equal expected type
+        if(!$this->isTypeCorrect()) {
+            throw new InvalidSourceStructureException("Argument must be `$argPattern`, in code is `$type`.");
         }
 
     }
-        
 
-    public function separateAndSave(string $unprocessedOperand) : void {
-        $parts = explode('@', $unprocessedOperand);
 
-        if (count($parts) == 2 && preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $parts[1])) {
-            $this->type = $parts[0];
-            $this->value = $parts[1];
-        } else {
-            throw new InvalidSourceStructureException("Argument error.");
-        }
-    }
+    /**
+     *  Get type
+     */
+    public function getType() : string
+    {
 
-    public function getType() : mixed {
         return $this->type;
-    }
 
-    public function getValue() : mixed {
-        return $this->value;
-    }
-
-    public function getArgPattern() : string{
-        return $this->argPattern;
     }
 
 
-    public function getSecondValue(string $unprocessedOperand, string $typeOfConstant) : string {
-        $secondValue = "";
+    /**
+     *  Get value
+     */
+    public function getValue() : mixed
+    {
 
-        $parts = explode('@', $unprocessedOperand, 2);
-        if (count($parts) > 1) {
-            $secondValue = $parts[1];
+        if($this->type == "var") {
+            $tmpValue = "";
+            $this->tmpType = $this->type;
+            
+            while($this->type == "var") {
+                if($this->getFirstValue() == "GF") {
+                    $tmpValue = $this->instructionPtr->interpreterPtr->frames["GF"]->getVariable(
+                        $this->getSecondValue() 
+                    );  
+                }
+                else if($this->getFirstValue() == "TF") {
+                    $tmpValue = $this->instructionPtr->interpreterPtr->frames["TF"]->getVariable(
+                        $this->getSecondValue() 
+                    );  
+                }
+                else if($this->getFirstValue() == "LF") {
+                    $tmpValue = $this->instructionPtr->interpreterPtr->framesStack->peek()->getVariable(
+                        $this->getSecondValue()
+                    );
+                }
+
+
+                if($tmpValue == NULL)
+                    $tmpValue = "x";
+                if($this->isVar($tmpValue) == true) {
+                    break;
+                }
+            }
+
+            return $tmpValue;
+        }
+        else
+            return $this->value;
+
+    }
+
+
+    /**
+     *  Checks if type of argument are correct
+     */
+    private function isTypeCorrect() : bool
+    {
+
+        // var
+        if($this->argPattern == "var") {
+            if($this->type == "var")
+                return true;
+            else
+                return false;
         }
 
-        if ($typeOfConstant == "bool" && ($secondValue != "true" && $secondValue != "false")) {
-            throw new InvalidSourceStructureException("Argument error.");
+        // symb
+        else if($this->argPattern == "symb") {
+            if (in_array($this->type, ["int", "bool", "string", "nil", "var"]))
+                return true;
+            else
+                return false;
         }
 
-        return $secondValue;
+        // label
+        else if($this->argPattern == "label") {
+            if($this->type == "label")
+                return true;
+            else
+                return false;
+        }
+
+        // type
+        else if($this->argPattern == "type") {
+            if (in_array($this->type, ["int", "bool", "string", "nil", "label", "type", "var"]))
+                return true;
+            else
+                return false;
+        }
+
+        else {
+            return false;
+        }
+
     }
 
 
-    public function processVar(string $unprocessedOperand) : void {
-        if (!preg_match('/^(LF|GF|TF)@[a-zA-Z_][a-zA-Z0-9_]*$/', $unprocessedOperand)) {
-            throw new InvalidSourceStructureException("Argument  error.");
-        } else {
-            $this->type = "var";
-            $this->value = $unprocessedOperand;
-        }
+    /**
+     *  Get second value of var
+     */
+    public function getSecondValue() : string {
+
+        $parts = explode('@', $this->value, 2);
+        return $parts[1];
+
     }
 
 
-    public function processSymb(string $unprocessedOperand) : void {
-        if (preg_match('/^(LF|GF|TF)@[a-zA-Z_][a-zA-Z0-9_]*$/', $unprocessedOperand)) {
-            $this->type = "var";
-            $this->value = $unprocessedOperand;
-        } elseif (preg_match('/^bool@(true|false)/', $unprocessedOperand)) {
-            $this->type = "bool";
-            $this->value = $this->getSecondValue($unprocessedOperand, "bool");
-        } elseif (preg_match('/^string@.*$/', $unprocessedOperand)) {
-            $this->type = "string";
-            $this->value = $this->getSecondValue($unprocessedOperand, "string");
-        } elseif (preg_match('/^nil@nil/', $unprocessedOperand)) {
-            $this->type = "nil";
-            $this->value = "nil";
-        } elseif (preg_match('/^int@(-?0x[0-9a-fA-F]+|-?0o[0-7]+|-?\d+)$/', $unprocessedOperand)) {
-            $this->type = "int";
-            $this->value = $this->getSecondValue($unprocessedOperand, "int");
-        } else {
-            throw new InvalidSourceStructureException("Argument error.");
-        }
+    /**
+     * Get first value of var
+     */
+    public function getFirstValue() : string {
+
+
+        $parts = explode('@', $this->value, 2);
+        return $parts[0];
+
     }
 
+    
+    /**
+     *  Check if paramater is var
+     */
+    private function isVar(mixed $tmpValue) : bool
+    {
 
-    public function processLabel(string $unprocessedOperand) : void {
-        if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $unprocessedOperand)) {
-            throw new InvalidSourceStructureException("Argument error.");
-        } else {
-            $this->type = "label";
-            $this->value = $unprocessedOperand;
-        }
-    }
+        $parts = explode('@', $tmpValue, 2);
+        if($parts[0] == "GF" || $parts[0] == "LF" || $parts[0] == "TF")
+            return true;
 
+        return false;
 
-    public function processType(string $unprocessedOperand) : void {
-        if (!in_array($unprocessedOperand, ["int", "bool", "string", "nil", "label", "type", "var"])) {
-            throw new InvalidSourceStructureException("Argument error.");
-        } else {
-            $this->type = "type";
-            $this->value = $unprocessedOperand;
-        }
     }
 
 
