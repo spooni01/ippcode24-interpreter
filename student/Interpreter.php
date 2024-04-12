@@ -62,18 +62,21 @@ class Interpreter extends AbstractInterpreter
             // Loop through instructions by order number
             while ($this->positionOfInstruction < (count($this->instructionNumbers) - 1) ) {
 
-                $this->positionOfInstruction += 1; // Increment to get next instruction, (starts from 0, predefined value is -1)
+                $this->positionOfInstruction++; // Increment to get next instruction, (starts from 0, predefined value is -1)
+                
                 $xmlInstr = $this->foundInstructionByOrderNumber($dom->documentElement); // Get instruction by its order number ($this->positionOfInstruction)
-
                 // Parse and execute instruction with order number $this->instructionNumbers
                 $instr = new Instruction($xmlInstr, (int)str_replace(" ", "", $this->instructionNumbers[$this->positionOfInstruction]), $this);
 
                 // If next instruction is special, set it to its position number
                 if($instr->isNextPositionSpecial()) {
                     $this->positionOfInstruction = $instr->getNextSpecialInstruction();
-                    $this->positionOfInstruction--; // Instruction function will return correct number, so it must be deacresed by 1 because at the beginning of another while cycle it will by instantly increased by 1
-                }
-
+                    $this->positionOfInstruction -= 1; // Instruction function will return correct number, so it must be deacresed by 1 because at the beginning of another while cycle it will by instantly increased by 1
+                
+                     // Get position of key
+                    $this->positionOfInstruction = array_search($this->positionOfInstruction, $this->instructionNumbers);
+                }  
+                
             }
 
         } catch (XMLException $errMsg) {

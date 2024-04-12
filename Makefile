@@ -19,7 +19,7 @@ check: pack vendor
 	./is_it_ok.sh $(LOGIN).zip $(TEMP_DIR) $(TASK) 
 
 run:
-	php8.3 $(SCRIPT) --source=codeexamples/read_test.src --input=codeexamples/read_test.in
+	php8.3 $(SCRIPT) --source=examplecode/example.src --input=examplecode/example.in
 
 stan:
 	php8.3 vendor/bin/phpstan analyze --level=6
@@ -27,9 +27,12 @@ stan:
 test:
 	python3.8 TESTS/supplementary-tests/test-int.py
 
-testold:
+testa:
 	bash ./tests/test.sh
 
+testb:
+	php8.3 test.php --directory=TESTS_2024/interpret-only --recursive --int-script=interpret.php --int-only --output=OUT.html --threads=4
+	
 run-help: interpret.php
 	if [ "${HOSTNAME}" = "merlin.fit.vutbr.cz" ]; then php8.3 $(SCRIPT) --help; else php $(SCRIPT) --help; fi
 

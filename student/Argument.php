@@ -23,8 +23,11 @@ class Argument
     /*
      *  Constructor
      */
-    public function __construct(string $value, string $type, string $argPattern, Instruction $instructionPtr)
+    public function __construct(mixed $value, string $type, mixed $argPattern, Instruction $instructionPtr)
     {
+
+        if($value == NULL || $argPattern == NULL)
+            throw new InvalidSourceStructureException("Problem with arguments");
 
         // Clean $value
         $value = str_replace("\n", "", $value);
@@ -159,8 +162,13 @@ class Argument
 
         // symb
         else if($this->argPattern == "symb") {
-            if (in_array($this->type, ["int", "bool", "string", "nil", "var"]))
+            if (in_array($this->type, ["int", "bool", "string", "nil", "var"])) {
+                if($this->type == "int" && !is_numeric($this->value)) {
+                    return false;
+                }
+                
                 return true;
+            }
             else
                 return false;
         }
@@ -175,8 +183,13 @@ class Argument
 
         // type
         else if($this->argPattern == "type") {
-            if (in_array($this->type, ["int", "bool", "string", "nil", "label", "type", "var"]))
+            if (in_array($this->type, ["int", "bool", "string", "nil", "label", "type", "var"])) {
+                if($this->type == "int" && !is_numeric($this->value)) {
+                    return false;
+                }
+
                 return true;
+            }
             else
                 return false;
         }

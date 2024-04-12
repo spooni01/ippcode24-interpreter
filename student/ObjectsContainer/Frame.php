@@ -5,6 +5,7 @@ namespace IPP\Student\ObjectsContainer;
 // Internal
 use IPP\Student\Exception\SemanticException; // return code 52
 use IPP\Student\Exception\VariableAccessException; // return code 54
+use IPP\Student\Exception\FrameAccessException; // return code 55
 
 
 class Frame
@@ -55,7 +56,7 @@ class Frame
     {
 
         if (!$this->hasVariable($name)) {
-            throw new SemanticException("Variable '$name' does not exist in this frame.");
+            throw new FrameAccessException("Variable '$name' does not exist in this frame.");
         }
 
         return $this->variables[$name];

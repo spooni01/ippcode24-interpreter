@@ -13,6 +13,7 @@ use IPP\Core\AbstractInterpreter;
 use IPP\Student\Exception\InvalidSourceStructureException; // return code 32
 use IPP\Student\Exception\SemanticException; // return code 52
 use IPP\Student\Exception\OperandTypeException; // return code 53
+use IPP\Student\Exception\FrameAccessException; // return code 55
 use IPP\Student\Exception\ValueException; // return code 56
 use IPP\Student\Exception\OperandValueException; // return code 57
 use IPP\Student\Exception\StringOperationException; // return code 58
@@ -127,6 +128,9 @@ class Instruction
             
             }
         }
+
+        if($cnt != $numOfCorrectArguments)
+            throw new InvalidSourceStructureException("Invalid number of arguments.");
 
         // Choose correct execute function
         switch ($this->opcode) {
@@ -427,6 +431,9 @@ class Instruction
             $this->interpreterPtr->frames["GF"]->defineVariable($this->arg1->getSecondValue());
         }
         else if($this->arg1->getFirstValue() == "TF") {
+            if($this->interpreterPtr->frames["TF"] == NULL)
+                throw new FrameAccessException("Frame TF do not exists.");
+
             $this->interpreterPtr->frames["TF"]->defineVariable($this->arg1->getSecondValue());
         }
         else if($this->arg1->getFirstValue() == "LF") {
@@ -823,7 +830,7 @@ class Instruction
             throw new OperandValueException("Can not divide by zero.");
         }
 
-        $result = (int)$this->arg2->getValue() / (int)$this->arg3->getValue();
+        $result = abs(intdiv((int)$this->arg2->getValue(), (int)$this->arg3->getValue()));
 
         // Save
         if($this->arg1->getFirstValue() == "GF") {
