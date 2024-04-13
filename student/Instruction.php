@@ -216,7 +216,7 @@ class Instruction
                 $this->execute_setchar();
                 break;
             case "TYPE":
-                // Handle TYPE operation
+                $this->execute_type();
                 break;
             case "LABEL":
                 $this->execute_label();
@@ -377,8 +377,11 @@ class Instruction
             $str = $this->arg1->getValue();
         }
 
+        if($str == NULL) 
+            return;
+
         // Replace blank characters and convert ASCII chars
-        $str = str_replace(" ", "", (string)$str);
+        //$str = str_replace(" ", "", (string)$str);
         $str = str_replace("\n", "", $str);
         $str = $this->replaceAsciiChars($str);
 
@@ -578,6 +581,8 @@ class Instruction
             $this->specialNextInstr = true;
             $this->specialNextInstrNum = $this->interpreterPtr->labels[$this->arg1->getValue()];
         }
+
+        $this->interpreterPtr->callStack->push($this->order + 1);
         
     }
 
@@ -1324,7 +1329,10 @@ class Instruction
     private function execute_type() : void
     {
 
-        $type = $this->arg2->getType();
+        $type = $this->arg2->getDeepType();
+
+        if($type == "nil@nil")
+            return;
 
         // Save
         if($this->arg1->getFirstValue() == "GF") {
@@ -1409,7 +1417,7 @@ class Instruction
     /**
      *  Execute RETURN
      */
-    private function execute_return()
+    private function execute_return() : void
     {
 
         if ($this->interpreterPtr->callStack->size() == 0)

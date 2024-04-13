@@ -15,7 +15,7 @@ use Throwable;
  */
 class ValueException extends Exception
 {
-    public function __construct(string $message = "Invalid semantic.", ?Throwable $previous = null) /** @phpstan-ignore-line */ 
+    public function __construct(string $message = "Invalid semantic.", ?Throwable $previous = null)
     {
         parent::__construct($message, ReturnCode::VALUE_ERROR, $previous);
     }

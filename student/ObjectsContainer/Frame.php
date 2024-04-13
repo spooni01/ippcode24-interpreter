@@ -106,7 +106,7 @@ class Frame
 
         $this->variables[$name] = $value;
         $this->types[$name] = $type;
-
+        
     }
 
 

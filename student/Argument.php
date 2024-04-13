@@ -69,6 +69,10 @@ class Argument
             $tmpType = "";
             
             while(preg_match("/(GF|TF|LF)@(\\S+)/", $tmpValue, $matches)) {
+
+                if($tmpValue == NULL) 
+                    break;
+
                 if($matches[1] == "GF") {
                     $tmpValue = $this->instructionPtr->interpreterPtr->frames["GF"]->getVariable(
                         $matches[2] 
@@ -94,7 +98,14 @@ class Argument
                         $matches[2] 
                     );  
                 }
+
+                if($tmpValue == NULL) 
+                    break;
+                
             }
+
+            if($tmpType == NULL)
+                $tmpType = "nil@nil";
 
             return $tmpType;
         }
