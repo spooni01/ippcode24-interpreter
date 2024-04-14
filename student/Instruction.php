@@ -69,6 +69,21 @@ class Instruction
         ["opCode" => "EXIT", "params" => ["symb"]],
         ["opCode" => "DPRINT", "params" => ["symb"]],
         ["opCode" => "BREAK", "params" => []],
+        ["opCode" => "CLEARS", "params" => []],
+        ["opCode" => "ADDS", "params" => []],
+        ["opCode" => "SUBS", "params" => []],
+        ["opCode" => "MULS", "params" => []],
+        ["opCode" => "IDIVS", "params" => []],
+        ["opCode" => "LTS", "params" => []],
+        ["opCode" => "GTS", "params" => []],
+        ["opCode" => "EQS", "params" => []],
+        ["opCode" => "ANDS", "params" => []],
+        ["opCode" => "ORS", "params" => []],
+        ["opCode" => "NOTS", "params" => []],
+        ["opCode" => "INT2CHARS", "params" => []],
+        ["opCode" => "STRI2INTS", "params" => []],
+        ["opCode" => "JUMPIFEQS", "params" => ["label"]],
+        ["opCode" => "JUMPIFNEQS", "params" => ["label"]],
     ];
 
 
@@ -238,7 +253,52 @@ class Instruction
                 break;
             case "BREAK":
                 $this->execute_break();
-                break;      
+                break;
+            case "ADDS":
+                $this->execute_adds();
+                break; 
+            case "CLEARS":
+                $this->execute_clears();
+                break;  
+            case "SUBS":
+                $this->execute_subs();
+                break;  
+            case "MULS":
+                $this->execute_muls();
+                break;    
+            case "IDIVS":
+                $this->execute_idivs();
+                break; 
+            case "LTS":
+                $this->execute_lts();
+                break; 
+            case "GTS":
+                $this->execute_gts();
+                break; 
+            case "EQS":
+                $this->execute_eqs();
+                break; 
+            case "ANDS":
+                $this->execute_ands();
+                break; 
+            case "ORS":
+                $this->execute_ors();
+                break; 
+            case "NOTS":
+                $this->execute_nots();
+                break; 
+            case "INT2CHARS":
+                $this->execute_int2chars();
+                break; 
+            case "STRI2INTS":
+                $this->execute_stri2ints();
+                break; 
+            case "JUMPIFEQS":
+                $this->execute_jumpifeqs();
+                break; 
+            case "JUMPIFNEQS":
+                $this->execute_jumpifneqs();
+                break; 
             default:
                 throw new InvalidSourceStructureException("Wrong opcode `$this->opcode` given.");             
         }
@@ -411,12 +471,31 @@ class Instruction
             else
                 $read = $this->interpreterPtr->input->readInt();
 
-            // Read from frame
-            $this->interpreterPtr->frames["GF"]->setVariable(
-                $this->arg1->getSecondValue(), 
-                $read,
-                $this->arg1->getType()
-            );   
+            // Save
+            if($this->arg1->getFirstValue() == "GF") {
+                $this->interpreterPtr->frames["GF"]->setVariable(
+                    $this->arg1->getSecondValue(), 
+                    $read,
+                    $this->arg2->getValue()
+                );   
+            }
+            else if($this->arg1->getFirstValue() == "TF") {
+                if($this->interpreterPtr->frames["TF"] == NULL)
+                    throw new FrameAccessException("Frame TF do not exists.");
+    
+                $this->interpreterPtr->frames["TF"]->setVariable(
+                    $this->arg1->getSecondValue(), 
+                    $read,
+                    $this->arg2->getValue()
+                );   
+            }
+            else if($this->arg1->getFirstValue() == "LF") {
+                $this->interpreterPtr->framesStack->peek()->setVariable(
+                    $this->arg1->getSecondValue(), 
+                    $read,
+                    $this->arg2->getValue()
+                );   
+            }
 
         }
 
@@ -1439,6 +1518,7 @@ class Instruction
     {
 
         $this->interpreterPtr->dataStack->push($this->arg1->getValue());
+        $this->interpreterPtr->dataStackTypes->push($this->arg1->getDeepType());
 
     }
 
@@ -1453,28 +1533,388 @@ class Instruction
             throw new ValueException("No data to pop.");
 
         $data = $this->interpreterPtr->dataStack->pop();
+        $dataType = $this->interpreterPtr->dataStackTypes->pop();
+
 
         // Save
         if($this->arg1->getFirstValue() == "GF") {
             
             $this->interpreterPtr->frames["GF"]->setVariable(
                 $this->arg1->getSecondValue(), 
-                $data, $this->arg1->getType()
+                $data, $dataType
             );  
         }
         else if($this->arg1->getFirstValue() == "TF") {
             $this->interpreterPtr->frames["TF"]->setVariable(
                 $this->arg1->getSecondValue(), 
-                $data, $this->arg1->getType()
+                $data, $dataType
             );  
         }
         else if($this->arg1->getFirstValue() == "LF") {
             $this->interpreterPtr->framesStack->peek()->setVariable(
                 $this->arg1->getSecondValue(),
-                $data, $this->arg1->getType()
+                $data, $dataType
             );
         }    
 
     }
+
+
+    /**
+     *  Execute ADDS
+     */
+    private function execute_adds() : void {
+
+        $val1 = $this->interpreterPtr->dataStack->pop();
+        $val2 = $this->interpreterPtr->dataStack->pop();
+
+        $type1 = $this->interpreterPtr->dataStackTypes->pop();
+        $type2 = $this->interpreterPtr->dataStackTypes->pop();
+
+        if($type1 != "int" || $type2 != "int")
+            throw new OperandTypeException("Operands in ADDS must be int");
+
+        $final = $val1+$val2;
+
+        $this->interpreterPtr->dataStack->push((string)$final);
+        $this->interpreterPtr->dataStackTypes->push((string)"int");
+
+    }
+
+
+    /**
+     *  Execute CLEARS
+     */
+    private function execute_clears() : void {
+
+        $this->interpreterPtr->dataStack->clear();
+        $this->interpreterPtr->dataStackTypes->clear();
+
+    }
+
+
+    /**
+     *  Execute SUBS
+     */
+    private function execute_subs() : void {
+
+        $val1 = $this->interpreterPtr->dataStack->pop();
+        $val2 = $this->interpreterPtr->dataStack->pop();
+
+        $type1 = $this->interpreterPtr->dataStackTypes->pop();
+        $type2 = $this->interpreterPtr->dataStackTypes->pop();
+
+        if($type1 != "int" || $type2 != "int")
+            throw new OperandTypeException("Operands in SUBS must be int");
+
+        $final = $val2-$val1;
+
+        $this->interpreterPtr->dataStack->push((string)$final);
+        $this->interpreterPtr->dataStackTypes->push((string)"int");
+
+    }
+
+
+    /**
+     *  Execute MULS
+     */
+    private function execute_muls() : void {
+
+        $val1 = $this->interpreterPtr->dataStack->pop();
+        $val2 = $this->interpreterPtr->dataStack->pop();
+
+        $type1 = $this->interpreterPtr->dataStackTypes->pop();
+        $type2 = $this->interpreterPtr->dataStackTypes->pop();
+
+        if($type1 != "int" || $type2 != "int")
+            throw new OperandTypeException("Operands in MULS must be int");
+
+        $final = $val2*$val1;
+
+        $this->interpreterPtr->dataStack->push((string)$final);
+        $this->interpreterPtr->dataStackTypes->push((string)"int");
+
+    }
+
+
+    /**
+     *  Execute IDIVS
+     */
+    private function execute_idivs() : void {
+
+        $val1 = $this->interpreterPtr->dataStack->pop();
+        $val2 = $this->interpreterPtr->dataStack->pop();
+
+        $type1 = $this->interpreterPtr->dataStackTypes->pop();
+        $type2 = $this->interpreterPtr->dataStackTypes->pop();
+
+        if($type1 != "int" || $type2 != "int")
+            throw new OperandTypeException("Operands in IDIVSS must be int");
+
+        if((int)$val1 == 0) {
+            throw new OperandValueException("Can not divide by zero.");
+        }
     
+        $final = intdiv($val2, $val1);
+
+        $this->interpreterPtr->dataStack->push((string)$final);
+        $this->interpreterPtr->dataStackTypes->push((string)"int");
+
+    }
+
+
+    /**
+     *  Execute LTS
+     */
+    private function execute_lts() : void {
+
+        $val1 = $this->interpreterPtr->dataStack->pop();
+        $val2 = $this->interpreterPtr->dataStack->pop();
+
+        $type1 = $this->interpreterPtr->dataStackTypes->pop();
+        $type2 = $this->interpreterPtr->dataStackTypes->pop();
+
+        if($type1 != $type2 || $type1 == "nil" || $type2 == "nil")
+            throw new OperandTypeException("Operands in EQS must be same type");
+
+        if($val2 < $val1)
+            $final = "true";
+        else
+            $final = "false";
+
+        $this->interpreterPtr->dataStack->push((string)$final);
+        $this->interpreterPtr->dataStackTypes->push((string)"bool");
+
+    }
+
+
+    /**
+     *  Execute GTS
+     */
+    private function execute_gts() : void {
+
+        $val1 = $this->interpreterPtr->dataStack->pop();
+        $val2 = $this->interpreterPtr->dataStack->pop();
+
+        $type1 = $this->interpreterPtr->dataStackTypes->pop();
+        $type2 = $this->interpreterPtr->dataStackTypes->pop();
+
+        if($type1 != $type2 || $type1 == "nil" || $type2 == "nil")
+            throw new OperandTypeException("Operands in EQS must be same type");
+
+        if($val2 > $val1)
+            $final = "true";
+        else
+            $final = "false";
+
+        $this->interpreterPtr->dataStack->push((string)$final);
+        $this->interpreterPtr->dataStackTypes->push((string)"bool");
+
+    }
+
+
+    /**
+     *  Execute EQS
+     */
+    private function execute_eqs() : void {
+
+        $val1 = $this->interpreterPtr->dataStack->pop();
+        $val2 = $this->interpreterPtr->dataStack->pop();
+
+        $type1 = $this->interpreterPtr->dataStackTypes->pop();
+        $type2 = $this->interpreterPtr->dataStackTypes->pop();
+
+        if($type1 != $type2 && $type1 != "nil" && $type2 != "nil")
+            throw new OperandTypeException("Operands in EQS must be same type");
+
+        if($val2 == $val1)
+            $final = "true";
+        else
+            $final = "false";
+
+        $this->interpreterPtr->dataStack->push((string)$final);
+        $this->interpreterPtr->dataStackTypes->push((string)"bool");
+
+    }
+
+
+    /**
+     *  Execute ANDS
+     */
+    private function execute_ands() : void {
+
+        $val1 = $this->interpreterPtr->dataStack->pop();
+        $val2 = $this->interpreterPtr->dataStack->pop();
+
+        $type1 = $this->interpreterPtr->dataStackTypes->pop();
+        $type2 = $this->interpreterPtr->dataStackTypes->pop();
+
+        if($type1 != "bool" || $type2 != "bool")
+            throw new OperandTypeException("Operands in ANDS must be same type");
+
+        if($val2 == "true" && $val1 == "true")
+            $final = "true";
+        else
+            $final = "false";
+
+        $this->interpreterPtr->dataStack->push((string)$final);
+        $this->interpreterPtr->dataStackTypes->push((string)"bool");
+
+    }
+
+
+    /**
+     *  Execute ORS
+     */
+    private function execute_ors() : void {
+
+        $val1 = $this->interpreterPtr->dataStack->pop();
+        $val2 = $this->interpreterPtr->dataStack->pop();
+
+        $type1 = $this->interpreterPtr->dataStackTypes->pop();
+        $type2 = $this->interpreterPtr->dataStackTypes->pop();
+
+        if($type1 != "bool" || $type2 != "bool")
+            throw new OperandTypeException("Operands in ANDS must be boolean");
+
+        if($val2 == "true" || $val1 == "true")
+            $final = "true";
+        else
+            $final = "false";
+
+        $this->interpreterPtr->dataStack->push((string)$final);
+        $this->interpreterPtr->dataStackTypes->push((string)"bool");
+
+    }
+
+
+    /**
+     *  Execute NOTS
+     */
+    private function execute_nots() : void {
+
+        $val1 = $this->interpreterPtr->dataStack->pop();
+        $type1 = $this->interpreterPtr->dataStackTypes->pop();
+
+        if($type1 != "bool")
+            throw new OperandTypeException("Operands in NOTS must be boolean");
+
+        if($val1 == "false")
+            $final = "true";
+        else
+            $final = "false";
+
+        $this->interpreterPtr->dataStack->push((string)$final);
+        $this->interpreterPtr->dataStackTypes->push((string)"bool");
+
+    }
+
+
+    /**
+     *  Execute INT2CHARS
+     */
+    private function execute_int2chars() : void {
+
+        $val1 = $this->interpreterPtr->dataStack->pop();
+        $type1 = $this->interpreterPtr->dataStackTypes->pop();
+
+        if($type1 != "int" && $val1 >= 0) {
+            throw new OperandTypeException("In INT2CHARS can not be `".$type1."`, can be only `int`");
+        }
+
+        // Transfer
+        $final = mb_chr($val1);
+        if(empty($final))
+            throw new StringOperationException("In INT2CHARS is unicode, that do not represent any char.");
+
+
+        // Save
+        $this->interpreterPtr->dataStack->push((string)$final);
+        $this->interpreterPtr->dataStackTypes->push((string)"string");
+
+    }
+
+
+    /**
+     *  Execute STRI2INTS
+     */
+    private function execute_stri2ints() : void {
+
+        $val1 = $this->interpreterPtr->dataStack->pop();
+        $type1 = $this->interpreterPtr->dataStackTypes->pop();
+        $val2 = $this->interpreterPtr->dataStack->pop();
+        $type2 = $this->interpreterPtr->dataStackTypes->pop();
+
+        if($type1 != "int" && $type2 != "int") {
+            throw new OperandTypeException("In STR2INT can not be `".$type1."`, can be only `string`");
+        }
+
+        // Transfer
+        $val1 = mb_substr($val1, (int)$val2, 1, 'UTF-8');
+
+        if(empty($val1))
+            throw new StringOperationException("In STR2INT is char that do not represent any UNICODE integer.");
+
+        // Save
+        $this->interpreterPtr->dataStack->push((string)$val1);
+        $this->interpreterPtr->dataStackTypes->push((string)"int");
+        
+
+    }
+
+
+    /**
+     *  Execute JUMPIFEQS
+     */
+    private function execute_jumpifeqs() : void {
+
+        $val1 = $this->interpreterPtr->dataStack->pop();
+        $type1 = $this->interpreterPtr->dataStackTypes->pop();
+        $val2 = $this->interpreterPtr->dataStack->pop();
+        $type2 = $this->interpreterPtr->dataStackTypes->pop();
+
+        // Check if their are the same type
+        if($type1 != $type2 && $type1 != "nil" && $type2 != "nil")
+            throw new OperandTypeException("JUMPIFEQS arguments must be the same type, you have `".$type1."` and `".$type2."`.");
+
+        // Jump if equal
+        if($val1 == $val2) {
+            if (!isset($this->interpreterPtr->labels[$this->arg1->getValue()]))
+                throw new SemanticException("Label `".$this->arg1->getValue()."` do not exists.");
+            else {
+                $this->specialNextInstr = true;
+                $this->specialNextInstrNum = $this->interpreterPtr->labels[$this->arg1->getValue()];
+            }
+        }
+
+    }
+
+
+    /**
+     *  Execute JUMPIFNEQS
+     */
+    private function execute_jumpifneqs() : void {
+
+        $val1 = $this->interpreterPtr->dataStack->pop();
+        $type1 = $this->interpreterPtr->dataStackTypes->pop();
+        $val2 = $this->interpreterPtr->dataStack->pop();
+        $type2 = $this->interpreterPtr->dataStackTypes->pop();
+
+        // Check if their are the same type
+        if($type1 != $type2 && $type1 != "nil" && $type2 != "nil")
+            throw new OperandTypeException("JUMPIFEQS arguments must be the same type.");
+
+        // Jump if equal
+        if($val1 != $val2) {
+            if (!isset($this->interpreterPtr->labels[$this->arg1->getValue()]))
+                throw new SemanticException("Label `".$this->arg1->getValue()."` do not exists.");
+            else {
+                $this->specialNextInstr = true;
+                $this->specialNextInstrNum = $this->interpreterPtr->labels[$this->arg1->getValue()];
+            }
+        }
+
+    }
+
+
 }

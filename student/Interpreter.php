@@ -43,7 +43,8 @@ class Interpreter extends AbstractInterpreter
     public int $positionOfInstruction = -1; // Stores position of current instruction in $instructionNumbers
     public mixed $frames = []; // Stores frames, initialization of frames in function initFrames()
     public Stack $framesStack; // Stores frames
-    public Stack $dataStack; // Stores frames
+    public Stack $dataStack; // Stores data
+    public Stack $dataStackTypes; // Stores types of data
     public Stack $callStack; // Stores data of calling functions/labels
     public mixed $labels = []; // Stores defined labels ("name" => "position")
 
@@ -212,6 +213,7 @@ class Interpreter extends AbstractInterpreter
         $this->framesStack = new Stack();
         $this->callStack = new Stack();
         $this->dataStack = new Stack();
+        $this->dataStackTypes = new Stack();
         
         $global = new Frame();
 
