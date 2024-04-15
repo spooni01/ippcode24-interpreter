@@ -26,7 +26,7 @@ class Argument
     public function __construct(mixed $value, string $type, mixed $argPattern, Instruction $instructionPtr)
     {
 
-        if($value == NULL || $argPattern == NULL)
+        if($argPattern == NULL)
             throw new InvalidSourceStructureException("Problem with arguments");
 
         // Clean $value
@@ -69,7 +69,6 @@ class Argument
             $tmpType = "";
             
             while(preg_match("/(GF|TF|LF)@(\\S+)/", $tmpValue, $matches)) {
-
                 if($tmpValue == NULL) 
                     break;
 
@@ -91,10 +90,11 @@ class Argument
                     );  
                 }
                 else if($matches[1] == "LF") {
+
                     $tmpValue = $this->instructionPtr->interpreterPtr->framesStack->peek()->getVariable(
                         $matches[2]
                     );
-                    $tmpType = $this->instructionPtr->interpreterPtr->frames["GF"]->getType(
+                    $tmpType = $this->instructionPtr->interpreterPtr->framesStack->peek()->getType(
                         $matches[2] 
                     );  
                 }
@@ -143,7 +143,7 @@ class Argument
 
 
                 if($tmpValue == NULL)
-                    $tmpValue = "x";
+                    $tmpValue = "";
                 if($this->isVar($tmpValue) == true) {
                     break;
                 }

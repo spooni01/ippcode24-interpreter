@@ -74,16 +74,17 @@ class Interpreter extends AbstractInterpreter
                     $this->positionOfInstruction = $instr->getNextSpecialInstruction();
                     $this->positionOfInstruction -= 1; // Instruction function will return correct number, so it must be deacresed by 1 because at the beginning of another while cycle it will by instantly increased by 1
                     
-                    if($this->positionOfInstruction > (count($this->instructionNumbers))) {
+                    // Get position of key
+                    $this->positionOfInstruction = array_search($this->positionOfInstruction+1, $this->instructionNumbers);
+
+                    if($this->positionOfInstruction > (count($this->instructionNumbers) - 1)) {
                         break;
                     }
-
-                     // Get position of key
-                    $this->positionOfInstruction = array_search($this->positionOfInstruction+1, $this->instructionNumbers);
 
                 }  
                 
             }
+
 
         } catch (XMLException $errMsg) {
             $this->stderr->writeString($errMsg);

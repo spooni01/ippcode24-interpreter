@@ -536,23 +536,29 @@ class Instruction
         if($this->arg2->getType() != "nil")
             $str = $this->arg2->getValue();
 
+        $type = $this->arg2->getType();
+        if($type == "var") {
+            $type = $this->arg2->getDeepType();
+
+        }
+
         // Choose frame
         if($this->arg1->getFirstValue() == "GF") {
             $this->interpreterPtr->frames["GF"]->setVariable(
                 $this->arg1->getSecondValue(), 
-                $str, $this->arg2->getType()
+                $str, $type
             );  
         }
         else if($this->arg1->getFirstValue() == "TF") {
             $this->interpreterPtr->frames["TF"]->setVariable(
                 $this->arg1->getSecondValue(), 
-                $str, $this->arg2->getType()
+                $str, $type
             );  
         }
         else if($this->arg1->getFirstValue() == "LF") {
             $this->interpreterPtr->framesStack->peek()->setVariable(
                 $this->arg1->getSecondValue(),
-                $str, $this->arg2->getType()
+                $str, $type
             );
         }
          
@@ -566,6 +572,7 @@ class Instruction
     private function execute_createframe() : void
     {
 
+        $this->interpreterPtr->frames["TF"] = NULL;
         $frame = new Frame();
         $this->interpreterPtr->frames["TF"] = $frame;
             
@@ -673,8 +680,8 @@ class Instruction
     {
 
         // Check if their are the same type
-        if($this->arg2->getDeepType() != $this->arg3->getDeepType())
-            throw new OperandTypeException("JUMPIFEQ arguments must be the same type.");
+        if($this->arg2->getDeepType() != $this->arg3->getDeepType() && $this->arg2->getDeepType()  != "nil@nil" && $this->arg3->getDeepType() != "nil@nil")
+            throw new OperandTypeException("JUMPIFEQ arguments must be the same type, you have `".$this->arg2->getDeepType()."` and `".$this->arg3->getDeepType()."`.");
 
         // Check if their are nil
         if($this->arg1->getType() == "nil" || $this->arg1->getType() == "nil")
@@ -707,8 +714,8 @@ class Instruction
         if($this->arg1->getType() == "nil" || $this->arg1->getType() == "nil")
             throw new SemanticException("`nil` can not be used in JUMPIFEQ operand.");
 
-        // Jump if equal
-        if(!strcmp($this->arg2->getValue(), $this->arg3->getValue())) {
+        // Jump if not equal
+        if($this->arg2->getValue() !== $this->arg3->getValue()) {
             if (!isset($this->interpreterPtr->labels[$this->arg1->getValue()]))
                 throw new SemanticException("Label `".$this->arg1->getValue()."` do not exists.");
             else {
@@ -731,7 +738,7 @@ class Instruction
         else {
 
             // Push to stack
-            $this->interpreterPtr->callStack->push($this->order + 1);
+            $this->interpreterPtr->callStack->push($this->order);
 
             // Set special next instruction
             $this->specialNextInstr = true;
@@ -774,19 +781,19 @@ class Instruction
         if($this->arg1->getFirstValue() == "GF") {
             $this->interpreterPtr->frames["GF"]->setVariable(
                 $this->arg1->getSecondValue(), 
-                $lenght, "string"
+                $lenght, "int"
             );  
         }
         else if($this->arg1->getFirstValue() == "TF") {
             $this->interpreterPtr->frames["TF"]->setVariable(
                 $this->arg1->getSecondValue(), 
-                $lenght, "string"
+                $lenght, "int"
             );  
         }
         else if($this->arg1->getFirstValue() == "LF") {
             $this->interpreterPtr->framesStack->peek()->setVariable(
                 $this->arg1->getSecondValue(),
-                $lenght, "string"
+                $lenght, "int"
             );
         }
 
@@ -840,7 +847,7 @@ class Instruction
             throw new OperandTypeException("In SUB must be only integers, you have `".$this->arg2->getDeepType()."` and `".$this->arg3->getDeepType()."`");
         }
 
-        $result = (int)$this->arg3->getValue() - (int)$this->arg2->getValue();
+        $result = (int)$this->arg2->getValue() - (int)$this->arg3->getValue();
 
         // Save
         if($this->arg1->getFirstValue() == "GF") {
@@ -1070,7 +1077,7 @@ class Instruction
 
         $arg2DeepType = $this->arg2->getDeepType();
 
-        if($arg2DeepType != $this->arg3->getDeepType() || $this->arg2->getDeepType() == "nil") {
+        if($arg2DeepType != $this->arg3->getDeepType() && $this->arg2->getDeepType() != "nil" && $this->arg3->getDeepType() != "nil") {
             throw new OperandTypeException("In LT can not be `".$this->arg2->getDeepType()."` or `".$this->arg3->getDeepType()."`");
         }
 
@@ -1372,19 +1379,19 @@ class Instruction
         if($this->arg1->getFirstValue() == "GF") {
             $this->interpreterPtr->frames["GF"]->setVariable(
                 $this->arg1->getSecondValue(), 
-                $value, "bool"
+                $value, "string"
             );  
         }
         else if($this->arg1->getFirstValue() == "TF") {
             $this->interpreterPtr->frames["TF"]->setVariable(
                 $this->arg1->getSecondValue(), 
-                $value, "bool"
+                $value, "string"
             );  
         }
         else if($this->arg1->getFirstValue() == "LF") {
             $this->interpreterPtr->framesStack->peek()->setVariable(
                 $this->arg1->getSecondValue(),
-                $value, "bool"
+                $value, "string"
             );
         }    
 
@@ -1397,7 +1404,41 @@ class Instruction
     private function execute_setchar() : void
     {
 
-   
+        $arg2DeepType = $this->arg2->getDeepType();
+        $arg3DeepType = $this->arg3->getDeepType();
+        $newChar = $this->arg3->getValue();
+        $pos = $this->arg2->getValue();
+        $oldStr = $this->arg1->getValue();
+
+        if($arg2DeepType == "nil" || $arg3DeepType == "nil" || $arg2DeepType == "bool" || $arg3DeepType == "bool" || $arg3DeepType == "int" || $arg2DeepType == "string") {
+            throw new OperandTypeException("In GETCHAR can not be `".$this->arg2->getDeepType()."`, can be only `string`");
+        }
+
+        $len = strlen($oldStr);
+        if ($pos < 0 || $pos >= $len || $newChar == "" || $newChar == NULL) {
+            throw new StringOperationException("Error in SETCHAR operand");
+        }
+        $value = substr_replace($oldStr, $newChar, $pos, 1);
+
+        // Save
+        if($this->arg1->getFirstValue() == "GF") {
+            $this->interpreterPtr->frames["GF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $value, "string"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "TF") {
+            $this->interpreterPtr->frames["TF"]->setVariable(
+                $this->arg1->getSecondValue(), 
+                $value, "string"
+            );  
+        }
+        else if($this->arg1->getFirstValue() == "LF") {
+            $this->interpreterPtr->framesStack->peek()->setVariable(
+                $this->arg1->getSecondValue(),
+                $value, "string"
+            );
+        }    
 
     }
 
@@ -1488,7 +1529,9 @@ class Instruction
     {
 
         $this->interpreterPtr->stderr->writeString("\nPosition in code: ".$this->order."\nGlobal frame values: ");
-        $this->interpreterPtr->stderr->writeString($this->interpreterPtr->frames["GF"]->flush()."\n\n");
+        $this->interpreterPtr->stderr->writeString($this->interpreterPtr->frames["GF"]->flush()."");
+        $this->interpreterPtr->stderr->writeString("\nTemporaly frame values: ");
+        $this->interpreterPtr->stderr->writeString($this->interpreterPtr->frames["TF"]->flush()."\n\n");
 
     }
 
@@ -1850,7 +1893,7 @@ class Instruction
         }
 
         // Transfer
-        $val1 = mb_substr($val1, (int)$val2, 1, 'UTF-8');
+        $val1 = mb_substr($val2, (int)$val1, 1, 'UTF-8');
 
         if(empty($val1))
             throw new StringOperationException("In STR2INT is char that do not represent any UNICODE integer.");

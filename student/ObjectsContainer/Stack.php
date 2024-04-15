@@ -90,6 +90,15 @@ class Stack
 
     }
 
+
+    /**
+     *  Write actual data
+     */
+    public function flush() : mixed 
+    {
+        return $this->items;
+    }
+
   
 }
 

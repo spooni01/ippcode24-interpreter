@@ -74,7 +74,10 @@ class Frame
             throw new SemanticException("Variable '$name' does not exist in this frame.");
         }
 
-        return $this->types[$name];
+        if(!array_key_exists($name, $this->types))
+            return NULL;
+        else
+            return $this->types[$name];
 
     }
 
