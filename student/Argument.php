@@ -49,6 +49,8 @@ class Argument
 
     /**
      *  Get type
+     *  Function return type of arguments (also "var" is correct return type).
+     *  To return type of variable that may be pointer, use getDeepType().
      */
     public function getType() : string
     {
@@ -60,6 +62,7 @@ class Argument
 
     /**
      *  Get deep type
+     *  Function will iterate through variables until it finds type != "var"
      */
     public function getDeepType() : string
     {
