@@ -133,18 +133,18 @@ class Interpreter extends AbstractInterpreter
         // Retrieve order numbers
         $rootNode = $dom->documentElement;
         foreach($rootNode->childNodes as $instr) {
-            if ($instr->nodeType === XML_ELEMENT_NODE) {
+            if ($instr->nodeType === XML_ELEMENT_NODE && $instr instanceof DOMElement) {
                 
                 // Check if numbers are bigger or equal 0
-                $orderNum = str_replace(" ", "", $instr->getAttribute("order")); /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
+                $orderNum = str_replace(" ", "", $instr->getAttribute("order"));
                 if (!ctype_digit($orderNum)) 
                     throw new InvalidSourceStructureException("Parameter `order` must be integer bigger or equal than zero.");     
                 else
                     array_push($this->instructionNumbers, $orderNum); 
                 
                 // Save label name with order num
-                if(strtoupper((string)$instr->getAttribute('opcode')) == "LABEL") { /** @phpstan-ignore-line */ // PHP STAN writes that getAttribute is undefined, but it is defined
-                    $tmpInstr = new Instruction($instr, (int)$orderNum, $this); /** @phpstan-ignore-line */ // $instr is DOMElement
+                if(strtoupper((string)$instr->getAttribute('opcode')) == "LABEL") { 
+                    $tmpInstr = new Instruction($instr, (int)$orderNum, $this); 
 
                     if (isset($this->labels[$tmpInstr->getArg1()->getValue()])) 
                         throw new SemanticException("Label already exists.");
@@ -166,11 +166,12 @@ class Interpreter extends AbstractInterpreter
         // Check if there is duplicated order number
         $orderCounts = array_count_values($this->instructionNumbers);
         foreach ($rootNode->childNodes as $child) {
-            
-            if ($child->nodeType === XML_ELEMENT_NODE && $child->tagName === 'instruction') { /** @phpstan-ignore-line */ // phpstan was throwing error that $tagName is undefined, but it exists
-                $order = (int) $child->getAttribute('order'); /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
-                if (isset($orderCounts[$order]) && $orderCounts[$order] > 1) 
-                    throw new InvalidSourceStructureException("There is duplicated order number: $order.");           
+            if($child instanceof DOMElement) {
+                if ($child->nodeType === XML_ELEMENT_NODE && $child->tagName === 'instruction') { 
+                    $order = (int) $child->getAttribute('order');
+                    if (isset($orderCounts[$order]) && $orderCounts[$order] > 1) 
+                        throw new InvalidSourceStructureException("There is duplicated order number: $order.");           
+                }
             }
             
         }
@@ -187,12 +188,14 @@ class Interpreter extends AbstractInterpreter
         
         foreach ($rootNode->childNodes as $instr) {
 
-            if ($instr->nodeType == XML_ELEMENT_NODE && $instr->tagName == 'instruction') { /** @phpstan-ignore-line */ // phpstan was throwing error that $tagName do not exists, but it exists
-                
-                if ((int)str_replace(" ", "", $instr->getAttribute('order')) == $this->instructionNumbers[$this->positionOfInstruction]) /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
-                    return $instr; /** @phpstan-ignore-line */ // phpstan was throwing error that this returns DOMNode, but it returns DOMElement
-                
- 
+            if ($instr instanceof DOMElement) {
+                if ($instr->nodeType == XML_ELEMENT_NODE && $instr->tagName == 'instruction') { 
+                    
+                    if ((int)str_replace(" ", "", $instr->getAttribute('order')) == $this->instructionNumbers[$this->positionOfInstruction]) 
+                        return $instr; 
+                    
+    
+                }
             }
 
         }

@@ -105,37 +105,37 @@ class Instruction
         $cnt = 0;
         $numOfCorrectArguments = count($opcodeParams);
         foreach ($node->childNodes as $childNode) {
-            if ($childNode->nodeType == XML_ELEMENT_NODE) {
+            if ($childNode->nodeType == XML_ELEMENT_NODE && $childNode instanceof DOMElement) {
 
                 $cnt++;
-                $tagName = $childNode->tagName; /** @phpstan-ignore-line */ // PHP STAN writes that tagName is undefined, but it is defined
+                $tagName = $childNode->tagName;
 
                 // Save to correct variable
                 if($cnt == 1 && $numOfCorrectArguments >= 1) 
                     if ($tagName == "arg1")
-                        $this->arg1 = new Argument($childNode->textContent, $childNode->getAttribute("type"), $opcodeParams[0], $this); /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
+                        $this->arg1 = new Argument($childNode->textContent, $childNode->getAttribute("type"), $opcodeParams[0], $this); 
                     else if  ($tagName == "arg2")
-                        $this->arg2 = new Argument($childNode->textContent, $childNode->getAttribute("type"), $opcodeParams[1], $this); /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
+                        $this->arg2 = new Argument($childNode->textContent, $childNode->getAttribute("type"), $opcodeParams[1], $this); 
                     else if  ($tagName == "arg3")
-                        $this->arg3 = new Argument($childNode->textContent, $childNode->getAttribute("type"), $opcodeParams[2], $this); /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
+                        $this->arg3 = new Argument($childNode->textContent, $childNode->getAttribute("type"), $opcodeParams[2], $this); 
                     else
                         throw new InvalidSourceStructureException("Invalid argument tag");
                 else if($cnt == 2 && $numOfCorrectArguments >= 2)
                     if ($tagName == "arg1")
-                        $this->arg1 = new Argument($childNode->textContent, $childNode->getAttribute("type"), $opcodeParams[0], $this); /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
+                        $this->arg1 = new Argument($childNode->textContent, $childNode->getAttribute("type"), $opcodeParams[0], $this); 
                     else if  ($tagName == "arg2")
-                        $this->arg2 = new Argument($childNode->textContent, $childNode->getAttribute("type"), $opcodeParams[1], $this); /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
+                        $this->arg2 = new Argument($childNode->textContent, $childNode->getAttribute("type"), $opcodeParams[1], $this); 
                     else if  ($tagName == "arg3")
-                        $this->arg3 = new Argument($childNode->textContent, $childNode->getAttribute("type"), $opcodeParams[2], $this); /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
+                        $this->arg3 = new Argument($childNode->textContent, $childNode->getAttribute("type"), $opcodeParams[2], $this); 
                     else
                         throw new InvalidSourceStructureException("Invalid argument tag");        
                 else if($cnt == 3 && $numOfCorrectArguments >= 3) 
                     if ($tagName == "arg1")
-                        $this->arg1 = new Argument($childNode->textContent, $childNode->getAttribute("type"), $opcodeParams[0], $this); /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
+                        $this->arg1 = new Argument($childNode->textContent, $childNode->getAttribute("type"), $opcodeParams[0], $this); 
                     else if  ($tagName == "arg2")
-                        $this->arg2 = new Argument($childNode->textContent, $childNode->getAttribute("type"), $opcodeParams[1], $this); /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
+                        $this->arg2 = new Argument($childNode->textContent, $childNode->getAttribute("type"), $opcodeParams[1], $this); 
                     else if  ($tagName == "arg3")
-                        $this->arg3 = new Argument($childNode->textContent, $childNode->getAttribute("type"), $opcodeParams[2], $this); /** @phpstan-ignore-line */ // phpstan was throwing error that function getAttribute() do not exists, but it exists
+                        $this->arg3 = new Argument($childNode->textContent, $childNode->getAttribute("type"), $opcodeParams[2], $this); 
                     else
                         throw new InvalidSourceStructureException("Invalid argument tag");
                 else
@@ -616,8 +616,12 @@ class Instruction
         $value1 = $this->arg2->getValue();
         $value2 = $this->arg3->getValue();
         
+        if($arg2DeepType == "var" && !preg_match("/(GF|TF|LF)@(\\S+)/", $value1, $matches)) {
+            $arg2DeepType = "string";
+        }
+
         if($arg2DeepType != $arg3DeepType ||  $arg2DeepType == "nil" || $arg3DeepType == "nil" || $arg2DeepType == "bool" || $arg3DeepType == "bool" ||  $arg2DeepType == "int" || $arg3DeepType == "int")
-            throw new OperandTypeException("CONCAT must have same types.");
+            throw new OperandTypeException("CONCAT must have same types, you have `".$arg2DeepType."` and `".$arg3DeepType."`.");
 
         $finalString = $value1 . $value2;
 
@@ -1577,6 +1581,10 @@ class Instruction
 
         $data = $this->interpreterPtr->dataStack->pop();
         $dataType = $this->interpreterPtr->dataStackTypes->pop();
+       
+        if($dataType == "var" && !preg_match("/(GF|TF|LF)@(\\S+)/", $data, $matches)) {
+            $dataType = "string";
+        }
 
 
         // Save

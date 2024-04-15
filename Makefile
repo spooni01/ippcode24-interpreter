@@ -24,6 +24,9 @@ run:
 stan:
 	php8.3 vendor/bin/phpstan analyze --level=6
 
+stanb:
+	php8.3 vendor/bin/phpstan analyze --level=0
+
 test:
 	python3.8 TESTS/supplementary-tests/test-int.py
 
